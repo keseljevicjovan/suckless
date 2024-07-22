@@ -65,9 +65,9 @@ static const Layout layouts[] = {
 static const char *medplaypausecmd[] = { "playerctl", "play-pause", NULL };
 static const char *mednextcmd[] = { "playerctl", "next", NULL };
 static const char *medprevcmd[] = { "playerctl", "previous", NULL };
-static const char *mutecmd[] = { "sh", "-c", "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; kill -44 $(pidof dwmblocks)", NULL };
-static const char *volupcmd[] = { "sh", "-c", "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+; kill -44 $(pidof dwmblocks)", NULL };
-static const char *voldowncmd[] = { "sh", "-c", "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-; kill -44 $(pidof dwmblocks)", NULL };
+static const char *mutecmd[] = { "sh", "-c", "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; kill -35 $(pidof dwmblocks)", NULL };
+static const char *volupcmd[] = { "sh", "-c", "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+; kill -35 $(pidof dwmblocks)", NULL };
+static const char *voldowncmd[] = { "sh", "-c", "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-; kill -35 $(pidof dwmblocks)", NULL };
 
 /* Brightness */
 static const char *brightness_up[]   = { "brightnessctl","s","5%+", NULL };
@@ -93,7 +93,7 @@ static const Key keys[] = {
   { MODKEY,                       XK_e,      spawn,          {.v = editor} },
   { 0,                            XK_Print,  spawn,          {.v = screenshot } },
   { MODKEY,                       XK_Print,  spawn,          {.v = screenshot_select } },
-  { MODKEY|ControlMask,           XK_space,  spawn,          {.v = keyboard_layout } },
+  { MODKEY,                       XK_space,  spawn,          {.v = keyboard_layout } },
   { MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
