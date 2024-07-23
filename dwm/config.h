@@ -73,6 +73,17 @@ static const char *voldowncmd[] = { "sh", "-c", "wpctl set-volume @DEFAULT_AUDIO
 static const char *brightness_up[]   = { "brightnessctl","s","5%+", NULL };
 static const char *brightness_down[] = { "brightnessctl","s","5%-", NULL };
 
+/* Picom */
+static const char *kill_picom[] = { "pkill", "picom", NULL};
+static const char *start_picom[] = { "picom", NULL };
+
+/* Screenshot */
+static const char *screenshot[] = { "screenshot", NULL};
+static const char *screenshot_select[] = { "screenshot", "select", NULL};
+
+/* Keyboardlayout */   
+static const char *keyboard_layout[] = { "change_keyboard_layout" };
+
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
@@ -80,9 +91,6 @@ static const char *termcmd[]  = { TERMINAL, NULL };
 static const char *browser[] = { "firefox", NULL };
 static const char *editor[] = { TERMINAL,"-e", "nvim", NULL };
 static const char *file_manager[] = { TERMINAL, "-e", "lfub", NULL};
-static const char *keyboard_layout[] = { "sh", "-c", "change_keyboard_layout" };
-static const char *screenshot[] = { "screenshot", NULL};
-static const char *screenshot_select[] = { "screenshot", "select", NULL};
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -94,6 +102,8 @@ static const Key keys[] = {
   { 0,                            XK_Print,  spawn,          {.v = screenshot } },
   { MODKEY,                       XK_Print,  spawn,          {.v = screenshot_select } },
   { MODKEY,                       XK_space,  spawn,          {.v = keyboard_layout } },
+  { MODKEY|ShiftMask,             XK_p,      spawn,          {.v = kill_picom } },
+  { MODKEY|ControlMask,           XK_p,      spawn,          {.v = start_picom } },
   { MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -111,6 +121,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
 	{ MODKEY|ShiftMask,             XK_v,      setlayout,      {0} },
 	{ MODKEY,                       XK_v,      togglefloating, {0} },
+	{ MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
