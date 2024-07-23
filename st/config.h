@@ -5,7 +5,7 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
+static char *font = "JetBrainsMono Nerd Font :pixelsize=10:antialias=true:autohint=true";
 static int borderpx = 2;
 
 /*
@@ -111,24 +111,24 @@ float alpha = 0.8;
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
 	/* 8 normal colors */
-	"black",
-	"red3",
-	"green3",
-	"yellow3",
-	"blue2",
-	"magenta3",
-	"cyan3",
-	"gray90",
+	[0] = "#1E1E1E", /* black   */
+	[1] = "#FF4242", /* red     */
+	[2] = "#608B4E", /* green   */
+	[3] = "#FFFF66", /* yellow  */
+	[4] = "#569CD6", /* blue    */
+	[5] = "#C678DD", /* magenta */
+	[6] = "#56B6C2", /* cyan    */
+	[7] = "#D4D4D4", /* white   */
 
 	/* 8 bright colors */
-	"gray50",
-	"red",
-	"green",
-	"yellow",
-	"#5c5cff",
-	"magenta",
-	"cyan",
-	"white",
+  [8]  = "#3C3C3C", /* light black   */
+	[9]  = "#FF5757", /* red     */
+	[10] = "#8C9B6D", /* light green   */
+	[11] = "#FFFF99", /* light yellow  */
+	[12] = "#669FF6", /* light blue    */
+	[13] = "#CC78FD", /* light magenta */
+	[14] = "#6EC6C6", /* light cyan    */
+	[15] = "#E0E0E0", /* light white   */
 
 	[255] = 0,
 
@@ -136,7 +136,7 @@ static const char *colorname[] = {
 	"#cccccc",
 	"#555555",
 	"gray90", /* default foreground colour */
-	"black", /* default background colour */
+	"#1d1f21", /* default background colour */
 };
 
 
@@ -210,15 +210,17 @@ static Shortcut shortcuts[] = {
 	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
 	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
 	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
-	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
-	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
-	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
+  { TERMMOD,              XK_plus,        zoom,           {.f = +1} },
+	{ TERMMOD,              XK_underscore,  zoom,           {.f = -1} },
+	{ TERMMOD,              XK_parenright,  zoomreset,      {.f =  0} },
 	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
 	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
-	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
+	{ ShiftMask,            XK_K,           kscrollup,      {.i = -1} },
+	{ ShiftMask,            XK_J,           kscrolldown,    {.i = -1} },
+  { ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
 	{ ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
 };
 
