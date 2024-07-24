@@ -21,9 +21,10 @@
 /*X(" ",      "music",            0   ,   4)*/\
 /*X(" ",      "cpu-percent",      5   ,   0)*/\
   X("",        "pacupdate",        3600,   3)  \
-  X("󰌌 ",      "keyboard-layout",  0,      2) \
-  X("  ",     "memory-percent",	 5,		   0)  \
-  X("",        "volume",           0,      1) \
+  X("󰌌 ",      "keyboard-layout",  0,      2)  \
+  X("  ",     "memory",        	 5,		   0)  \
+/*X("  ",     "memory-percent",	 5,		   0)*/\
+  X("",        "volume",           0,      1)  \
   X(" ",      "clock-date",       360,    0)  \
   X(" ",      "clock-time",       1,      0)
 
