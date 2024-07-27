@@ -82,8 +82,11 @@ static const char *start_picom[] = { "picom", NULL };
 static const char *screenshot[] = { "screenshot", NULL};
 static const char *screenshot_select[] = { "screenshot", "select", NULL};
 
-/* Keyboardlayout */   
-static const char *keyboard_layout[] = { "change_keyboard_layout" };
+/* Keyboard Layout */   
+static const char *keyboard_layout[] = { "change_keyboard_layout", NULL };
+
+/* Lock screen */
+static const char *locker[] = { "slock", NULL };
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
@@ -105,6 +108,7 @@ static const Key keys[] = {
   { MODKEY,                       XK_space,                 spawn,            {.v = keyboard_layout } },
   { MODKEY|ShiftMask,             XK_p,                     spawn,            {.v = kill_picom } },
   { MODKEY|ControlMask,           XK_p,                     spawn,            {.v = start_picom } },
+  { MODKEY,                       XK_s,                     spawn,            {.v = locker } },
   { MODKEY|ShiftMask,             XK_b,                     togglebar,        {0} },
 	{ MODKEY,                       XK_j,                     focusstack,       {.i = +1 } },
 	{ MODKEY,                       XK_k,                     focusstack,       {.i = -1 } },
