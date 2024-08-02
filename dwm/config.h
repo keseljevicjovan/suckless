@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int gappx     = 5;        /* gaps between windows */
 static const int swallowfloating    = 1;        /* 1 means swallow floating windows by default */
 static const unsigned int snap      = 32;       /* snap pixel */
@@ -118,6 +118,8 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_p,                     incnmaster,       {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_h,                     setmfact,         {.f = -0.02 } },
 	{ MODKEY|ShiftMask,             XK_l,                     setmfact,         {.f = +0.02 } },
+	{ MODKEY|ControlMask,           XK_j,                     pushdown,         {0} },
+	{ MODKEY|ControlMask,           XK_k,                     pushup,           {0} },
 	{ MODKEY|ShiftMask,             XK_Return,                zoom,             {0} },
 	{ MODKEY,                       XK_Tab,                   view,             {0} },
 	{ MODKEY,	                      XK_q,                     killclient,       {0} },
