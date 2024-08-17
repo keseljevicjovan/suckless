@@ -126,17 +126,17 @@ static const char *colorname[] = {
     [10] = "#8C9B6D", /* light green   */
     [11] = "#FFFF99", /* light yellow  */
     [12] = "#669FF6", /* light blue    */
-    [13] = "#CC78FD", /* light magenta */
+    [13] = "#CC77FD", /* light magenta */
     [14] = "#6EC6C6", /* light cyan    */
     [15] = "#E0E0E0", /* light white   */
 
     [255] = 0,
 
     /* more colors can be added after 255 to use with DefaultXX */
-    "#cccccc",
-    "#555555",
-    "gray90", /* default foreground colour */
-    "#1d1f21", /* default background colour */
+    [256] = "#cccccc", /* cursor */
+    [257] = "#555555", /* reverse cursor */
+    [258] = "#1d1f21", /* default background colour */
+    [259] = "gray90", /* default foreground colour */
 };
 
 
@@ -144,10 +144,11 @@ static const char *colorname[] = {
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-unsigned int defaultfg = 258;
-unsigned int defaultbg = 259;
+unsigned int defaultfg = 259;
+unsigned int defaultbg = 258;
 unsigned int defaultcs = 256;
-static unsigned int defaultrcs = 257;
+unsigned int defaultrcs = 257;
+unsigned int background = 258;
 
 /*
  * Default shape of cursor
@@ -206,9 +207,9 @@ ResourcePref resources[] = {
     { "color13",      STRING,  &colorname[13] },
     { "color14",      STRING,  &colorname[14] },
     { "color15",      STRING,  &colorname[15] },
-    { "background",   STRING,  &colorname[256] },
-    { "foreground",   STRING,  &colorname[257] },
-    { "cursorColor",  STRING,  &colorname[258] },
+    { "background",   STRING,  &colorname[258] },
+    { "foreground",   STRING,  &colorname[259] },
+    { "cursorColor",  STRING,  &colorname[256] },
     { "termname",     STRING,  &termname },
     { "shell",        STRING,  &shell },
     { "minlatency",   INTEGER, &minlatency },
