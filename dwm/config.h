@@ -211,7 +211,8 @@ static const Key keys[] = {
     TAGKEYS(                        XK_7,                                       6)
     TAGKEYS(                        XK_8,                                       7)
     TAGKEYS(                        XK_9,                                       8)
-    { MODKEY|ShiftMask,             XK_q,                     quit,             {0} },
+    { MODKEY|ShiftMask,             XK_q,                     quit,             {1} }, // with restore
+    { MODKEY|ControlMask,           XK_q,                     quit,             {0} }, // without restore
     { MODKEY,                       XK_apostrophe,            scratchpad_show,  {0} },
     { MODKEY|ShiftMask,             XK_apostrophe,            scratchpad_hide,  {0} },
     { MODKEY,                       XK_backslash,             scratchpad_remove,{0} },
