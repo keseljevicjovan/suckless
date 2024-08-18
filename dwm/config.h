@@ -1,33 +1,34 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static unsigned int borderpx  = 1;        /* border pixel of windows */
-static unsigned int gappx     = 3;        /* gaps between windows */
-static int swallowfloating    = 1;        /* 1 means swallow floating windows by default */
-static unsigned int snap      = 32;       /* snap pixel */
-static int showbar            = 1;        /* 0 means no bar */
-static int topbar             = 1;        /* 0 means bottom bar */
-static char font[]            = "JetBrainsMono Nerd Font :size=9" ;
-static char dmenufont[]       = "JetBrainsMono Nerd Font :size=9" ;
-static const char *fonts[]    = { font };
-static char normbgcolor[]     = "#222222";
-static char normbordercolor[] = "#444444";
-static char normfgcolor[]     = "#bbbbbb";
-static char selfgcolor[]      = "#eeeeee";
-static char selbordercolor[]  = "#005577";
-static char selbgcolor[]      = "#005577";
-static const float baralpha = 0.8;      
+static unsigned int borderpx   = 1;        /* border pixel of windows */
+static unsigned int gappx      = 3;        /* gaps between windows */
+static int swallowfloating     = 1;        /* 1 means swallow floating windows by default */
+static unsigned int snap       = 32;       /* snap pixel */
+static int showbar             = 1;        /* 0 means no bar */
+static int topbar              = 1;        /* 0 means bottom bar */
+static char font[]             = "JetBrainsMono Nerd Font :size=10" ;
+static char dmenufont[]        = "JetBrainsMono Nerd Font :size=10" ;
+static const char *fonts[]     = { font };
+static char normbgcolor[]      = "#222222"; // gray1
+static char normbordercolor[]  = "#444444"; // gray2
+static char normfgcolor[]      = "#bbbbbb"; // gray3
+static char selfgcolor[]       = "#eeeeee"; // gray4
+static char selbordercolor[]   = "#005577"; // cyan
+static char selbgcolor[]       = "#005577"; // cyan
+static const float baralpha_bg = 0.8;
+static const float baralpha_fg = 1.0;
 static const float borderalpha = 1.0;
 
-static const char *colors[][3]      = {
-	/*               fg           bg           border   */
+static const char *colors[][3] = {
+	/*               fg           bg           border          */
     [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
     [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
 };
-static float alphas[][3]      = {
-    /*               fg      bg        border*/
-    [SchemeNorm] = { 1.0 , baralpha, borderalpha },
-	[SchemeSel]  = { 1.0 , baralpha, borderalpha },
+static float alphas[][3] = {
+    /*               fg           bg           border     */
+    [SchemeNorm] = { baralpha_fg, baralpha_bg, borderalpha },
+    [SchemeSel]  = { baralpha_fg, baralpha_bg, borderalpha },
 };
 
 /* tagging */
@@ -68,7 +69,6 @@ static const Layout layouts[] = {
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
-
 
 /* Terminal Emulator */
 #define TERMINAL "st"
@@ -113,9 +113,13 @@ static const char *editor[] = { TERMINAL,"-e", "nvim", NULL };
 /* File Manager */
 static const char *file_manager[] = { TERMINAL, "-e", "lfub", NULL };
 
+/* Colorscheme */
+static const char *dmenu_colorscheme[] = { "dmenu_change_colorscheme", NULL };
+
 /* Dmenu */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
+
 /*
  * Xresources preferences to load at startup
  */
@@ -135,12 +139,12 @@ ResourcePref resources[] = {
     { "nmaster",            INTEGER, &nmaster },
     { "resizehints",        INTEGER, &resizehints },
     { "mfact",              FLOAT,   &mfact },
-    { "alphaNormFG",        FLOAT,   &alphas[SchemeNorm][0] }, 
-    { "alphaNormBG",        FLOAT,   &alphas[SchemeNorm][1] }, 
-    { "alphaNormBorder",    FLOAT,   &alphas[SchemeNorm][2] }, 
-    { "alphaSelFG",         FLOAT,   &alphas[SchemeSel][0] },  
-    { "alphaSelBG",         FLOAT,   &alphas[SchemeSel][1] },  
-    { "alphaSelBorder",     FLOAT,   &alphas[SchemeSel][2] }, 
+    { "baralpha_fg",        FLOAT,   &alphas[SchemeNorm][0] }, 
+    { "baralpha_bg",        FLOAT,   &alphas[SchemeNorm][1] }, 
+    { "borderalpha",        FLOAT,   &alphas[SchemeNorm][2] }, 
+    { "baralpha_fg",        FLOAT,   &alphas[SchemeSel][0] },  
+    { "baralpha_bg",        FLOAT,   &alphas[SchemeSel][1] },  
+    { "borderalpha",        FLOAT,   &alphas[SchemeSel][2] },
 };
 
 static const Key keys[] = {
@@ -158,6 +162,7 @@ static const Key keys[] = {
     { MODKEY|ControlMask,           XK_p,                     spawn,            {.v = start_picom } },
     { MODKEY,                       XK_s,                     spawn,            {.v = locker } },
     { MODKEY,                       XK_w,                     spawn,            {.v = dmenu_wallpaper } },
+    { MODKEY,                       XK_c,                     spawn,            {.v = dmenu_colorscheme } },
     { MODKEY|ShiftMask,             XK_b,                     togglebar,        {0} },
     { MODKEY,                       XK_j,                     focusstack,       {.i = +1 } },
     { MODKEY,                       XK_k,                     focusstack,       {.i = -1 } },
