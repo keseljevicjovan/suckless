@@ -1,31 +1,33 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
-static const unsigned int gappx     = 3;        /* gaps between windows */
-static const int swallowfloating    = 1;        /* 1 means swallow floating windows by default */
-static const unsigned int snap      = 32;       /* snap pixel */
-static const int showbar            = 1;        /* 0 means no bar */
-static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "JetBrainsMono Nerd Font :size=9" };
-static const char dmenufont[]       = "JetBrainsMono Nerd Font :size=9" ;
-static const char col_gray1[]       = "#222222";
-static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#bbbbbb";
-static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#005577";
-static const unsigned int baralpha = 0xd0;
-static const unsigned int borderalpha = OPAQUE;
+static unsigned int borderpx  = 1;        /* border pixel of windows */
+static unsigned int gappx     = 3;        /* gaps between windows */
+static int swallowfloating    = 1;        /* 1 means swallow floating windows by default */
+static unsigned int snap      = 32;       /* snap pixel */
+static int showbar            = 1;        /* 0 means no bar */
+static int topbar             = 1;        /* 0 means bottom bar */
+static char font[]            = "JetBrainsMono Nerd Font :size=9" ;
+static char dmenufont[]       = "JetBrainsMono Nerd Font :size=9" ;
+static const char *fonts[]    = { font };
+static char normbgcolor[]     = "#222222";
+static char normbordercolor[] = "#444444";
+static char normfgcolor[]     = "#bbbbbb";
+static char selfgcolor[]      = "#eeeeee";
+static char selbordercolor[]  = "#005577";
+static char selbgcolor[]      = "#005577";
+static const float baralpha = 0.8;      
+static const float borderalpha = 1.0;
 
 static const char *colors[][3]      = {
-	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+	/*               fg           bg           border   */
+    [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
+    [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
 };
-static const unsigned int alphas[][3]      = {
+static float alphas[][3]      = {
     /*               fg      bg        border*/
-    [SchemeNorm] = { OPAQUE, baralpha, borderalpha },
-	[SchemeSel]  = { OPAQUE, baralpha, borderalpha },
+    [SchemeNorm] = { 1.0 , baralpha, borderalpha },
+	[SchemeSel]  = { 1.0 , baralpha, borderalpha },
 };
 
 /* tagging */
@@ -44,9 +46,9 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
-static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
-static const int nmaster     = 1;    /* number of clients in master area */
-static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
+static float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
+static int nmaster     = 1;    /* number of clients in master area */
+static int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
 static const Layout layouts[] = {
@@ -90,7 +92,7 @@ static const char *start_picom[] = { "picom", NULL };
 
 /* Screenshot */
 static const char *screenshot[] = { "screenshot", NULL};
-static const char *screenshot_select[] = { "screenshot", "select", NULL};
+static const char *screenshot_select[] = { "screenshot", "select", NULL };
 
 /* Keyboard Layout */   
 static const char *keyboard_layout[] = { "change_keyboard_layout", NULL };
@@ -109,11 +111,37 @@ static const char *browser[] = { "firefox", NULL };
 static const char *editor[] = { TERMINAL,"-e", "nvim", NULL };
 
 /* File Manager */
-static const char *file_manager[] = { TERMINAL, "-e", "lfub", NULL};
+static const char *file_manager[] = { TERMINAL, "-e", "lfub", NULL };
 
 /* Dmenu */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
+/*
+ * Xresources preferences to load at startup
+ */
+ResourcePref resources[] = {
+    { "font",               STRING,  &font },
+    { "dmenufont",          STRING,  &dmenufont },
+    { "normbgcolor",        STRING,  &normbgcolor },
+    { "normbordercolor",    STRING,  &normbordercolor },
+    { "normfgcolor",        STRING,  &normfgcolor },
+    { "selbgcolor",         STRING,  &selbgcolor },
+    { "selbordercolor",     STRING,  &selbordercolor },
+    { "selfgcolor",         STRING,  &selfgcolor },
+    { "borderpx",           INTEGER, &borderpx },
+    { "snap",               INTEGER, &snap },
+    { "showbar",            INTEGER, &showbar },
+    { "topbar",             INTEGER, &topbar },
+    { "nmaster",            INTEGER, &nmaster },
+    { "resizehints",        INTEGER, &resizehints },
+    { "mfact",              FLOAT,   &mfact },
+    { "alphaNormFG",        FLOAT,   &alphas[SchemeNorm][0] }, 
+    { "alphaNormBG",        FLOAT,   &alphas[SchemeNorm][1] }, 
+    { "alphaNormBorder",    FLOAT,   &alphas[SchemeNorm][2] }, 
+    { "alphaSelFG",         FLOAT,   &alphas[SchemeSel][0] },  
+    { "alphaSelBG",         FLOAT,   &alphas[SchemeSel][1] },  
+    { "alphaSelBorder",     FLOAT,   &alphas[SchemeSel][2] }, 
+};
 
 static const Key keys[] = {
     /* modifier                     key                       function          argument */
