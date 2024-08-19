@@ -31,6 +31,7 @@ Also available in the patches directories:
  - movecenter
  - nomonocleborders
  - push_no_master
+ - restoreafterrestart
  - scratchpad
  - swallow
  - xresources
