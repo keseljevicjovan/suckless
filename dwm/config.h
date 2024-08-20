@@ -139,6 +139,7 @@ ResourcePref resources[] = {
     { "nmaster",            INTEGER, &nmaster },
     { "resizehints",        INTEGER, &resizehints },
     { "mfact",              FLOAT,   &mfact },
+    { "gappx",              FLOAT,   &gappx },
     { "baralpha_fg",        FLOAT,   &alphas[SchemeNorm][0] }, 
     { "baralpha_bg",        FLOAT,   &alphas[SchemeNorm][1] }, 
     { "borderalpha",        FLOAT,   &alphas[SchemeNorm][2] }, 
