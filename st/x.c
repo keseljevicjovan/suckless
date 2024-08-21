@@ -14,7 +14,6 @@
 #include <X11/keysym.h>
 #include <X11/Xft/Xft.h>
 #include <X11/XKBlib.h>
-#include <X11/Xresource.h>
 
 char *argv0;
 #include "arg.h"
@@ -45,41 +44,6 @@ typedef struct {
 	signed char appkey;    /* application keypad */
 	signed char appcursor; /* application cursor */
 } Key;
-
-//// Xresources preferences
-//enum resource_type {
-//	STRING = 0,
-//	INTEGER = 1,
-//	FLOAT = 2
-//};
-//
-//typedef struct {
-//	char *name;
-//	enum resource_type type;
-//	void *dst;
-//} ResourcePref;
-
-#define XRESOURCE_LOAD_META(NAME)                                  \
-	if(!XrmGetResource(xrdb, "st." NAME, "st." NAME, &type, &ret)) \
-		XrmGetResource(xrdb, "*." NAME, "*." NAME, &type, &ret);   \
-	if (ret.addr != NULL && !strncmp("String", type, 64))
-
-#define XRESOURCE_LOAD_STRING(NAME, DST) \
-	XRESOURCE_LOAD_META(NAME)            \
-		DST = ret.addr;
-
-#define XRESOURCE_LOAD_CHAR(NAME, DST) \
-	XRESOURCE_LOAD_META(NAME)            \
-		DST = ret.addr[0];
-
-#define XRESOURCE_LOAD_INTEGER(NAME, DST)  \
-	XRESOURCE_LOAD_META(NAME)              \
-		DST = strtoul(ret.addr, NULL, 10);
-
-#define XRESOURCE_LOAD_FLOAT(NAME, DST) \
-	XRESOURCE_LOAD_META(NAME)           \
-		DST = strtof(ret.addr, NULL);
-
 
 /* X modifiers */
 #define XK_ANY_MOD    UINT_MAX
@@ -904,8 +868,8 @@ xclear(int x1, int y1, int x2, int y2)
 void
 xhints(void)
 {
-	XClassHint class = {opt_name ? opt_name : "st",
-	                    opt_class ? opt_class : "St"};
+	XClassHint class = {opt_name ? opt_name : termname,
+	                    opt_class ? opt_class : termname};
 	XWMHints wm = {.flags = InputHint, .input = 1};
 	XSizeHints *sizeh;
 
@@ -1182,6 +1146,8 @@ xinit(int cols, int rows)
 	XWindowAttributes attr;
 	XVisualInfo vis;
 
+	if (!(xw.dpy = XOpenDisplay(NULL)))
+		die("can't open display\n");
 	xw.scr = XDefaultScreen(xw.dpy);
 
 	if (!(opt_embed && (parent = strtol(opt_embed, NULL, 0)))) {
@@ -2083,120 +2049,16 @@ run(void)
 }
 
 void
-xrdb_load(void)
-{
-	/* XXX */
-	char *xrm;
-	char *type;
-	XrmDatabase xrdb;
-	XrmValue ret;
-	Display *dpy;
-
-	if(!(dpy = XOpenDisplay(NULL)))
-		die("Can't open display\n");
-
-	XrmInitialize();
-	xrm = XResourceManagerString(dpy);
-
-	if (xrm != NULL) {
-		xrdb = XrmGetStringDatabase(xrm);
-
-		/* handling colors here without macros to do via loop. */
-		int i = 0;
-		char loadValue[12] = "";
-		for (i = 0; i < 256; i++)
-		{
-			sprintf(loadValue, "%s%d", "st.color", i);
-
-			if(!XrmGetResource(xrdb, loadValue, loadValue, &type, &ret))
-			{
-				sprintf(loadValue, "%s%d", "*.color", i);
-				if (!XrmGetResource(xrdb, loadValue, loadValue, &type, &ret))
-					/* reset if not found (unless in range for defaults). */
-					if (i > 15)
-						colorname[i] = NULL;
-			}
-
-			if (ret.addr != NULL && !strncmp("String", type, 64))
-				colorname[i] = ret.addr;
-		}
-
-		XRESOURCE_LOAD_STRING("foreground", colorname[256]);
-		XRESOURCE_LOAD_STRING("background", colorname[258]);
-		XRESOURCE_LOAD_STRING("cursorfg", colorname[258])
-		else {
-		  // this looks confusing because we are chaining off of the if
-		  // in the macro. probably we should be wrapping everything blocks
-		  // so this isn't possible...
-		  defaultcs = defaultfg;
-		}
-		XRESOURCE_LOAD_STRING("reverse-cursor", colorname[259])
-		else {
-		  // see above.
-		  defaultrcs = defaultbg;
-		}
-		XRESOURCE_LOAD_STRING("font", font);
-		XRESOURCE_LOAD_STRING("termname", termname);
-		XRESOURCE_LOAD_STRING("shell", shell);
-
-//		XRESOURCE_LOAD_INTEGER("xfps", xfps);
-//		XRESOURCE_LOAD_INTEGER("actionfps", actionfps);
-		XRESOURCE_LOAD_INTEGER("blinktimeout", blinktimeout);
-		XRESOURCE_LOAD_INTEGER("bellvolume", bellvolume);
-//		XRESOURCE_LOAD_INTEGER("bold_font", bold_font);
-		XRESOURCE_LOAD_INTEGER("borderpx", borderpx);
-//		XRESOURCE_LOAD_INTEGER("cursorshape", xw.cursor);
-//		cursorblinkstate = 1; // in case if cursor shape was changed from a blinking one to a non-blinking
-//		XRESOURCE_LOAD_INTEGER("cursorthickness", cursorthickness);
-//		XRESOURCE_LOAD_INTEGER("cursorblinkstyle", cursorblinkstyle);
-//		XRESOURCE_LOAD_INTEGER("cursorblinkontype", cursorblinkontype);
-
-//		XRESOURCE_LOAD_INTEGER("mouseScrollLines", mousescrolllines);
-
-		XRESOURCE_LOAD_FLOAT("cwscale", cwscale);
-		XRESOURCE_LOAD_FLOAT("chscale", chscale);
-
-//		XRESOURCE_LOAD_CHAR("prompt_char", prompt_char);
-
-//		if (!xrdb_overrides_alpha) {
-//			XRESOURCE_LOAD_INTEGER("opacity", alpha);
-//		}
-
-//		XRESOURCE_LOAD_STRING("imstyle", imstyle);
-//		imstyle = strtolower(imstyle);
-	}
-	XFlush(dpy);
-}
-
-void
-reload(int sig)
-{
-	xrdb_load();
-	/* colors, fonts */
-	xloadcols();
-	xunloadfonts();
-	xloadfonts(font, 0);
-
-	/* pretend the window just got resized */
-	cresize(win.w, win.h);
-	ttyresize(win.tw, win.th);
-
-	redraw();
-
-	/* triggers re-render if we're visible. */
-	ttywrite("\033[O", 3, 0);
-
-	signal(SIGUSR1, reload);
-}
-
-
-void
 usage(void)
 {
-	die("usage: %s [-aiv] [-c class] [-f font] [-g geometry] [-n name] [-o file]\n"
-	    "          [-T title] [-t title] [-w windowid] [[-e] command [args ...]]\n"
-	    "       %s [-aiv] [-c class] [-f font] [-g geometry] [-n name] [-o file]\n"
-	    "          [-T title] [-t title] [-w windowid] -l line [stty_args ...]\n", argv0, argv0);
+	die("usage: %s [-aiv] [-c class] [-f font] [-g geometry]"
+	    " [-n name] [-o file]\n"
+	    "          [-T title] [-t title] [-w windowid]"
+	    " [[-e] command [args ...]]\n"
+	    "       %s [-aiv] [-c class] [-f font] [-g geometry]"
+	    " [-n name] [-o file]\n"
+	    "          [-T title] [-t title] [-w windowid] -l line"
+	    " [stty_args ...]\n", argv0, argv0);
 }
 
 int
@@ -2262,15 +2124,8 @@ run:
 
 	setlocale(LC_CTYPE, "");
 	XSetLocaleModifiers("");
-
-	if(!(xw.dpy = XOpenDisplay(NULL)))
-		die("Can't open display\n");
-
-	xrdb_load();
-
-    cols = MAX(cols, 1);
+	cols = MAX(cols, 1);
 	rows = MAX(rows, 1);
-    signal(SIGUSR1, reload);
 	tnew(cols, rows);
 	xinit(cols, rows);
 	xsetenv();
