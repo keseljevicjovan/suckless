@@ -64,6 +64,14 @@ Also available in the patches directories:
 
 dwm, st, and dmenu support XResources. For color schemes, scripts and configuration, see my [dotfiles](https://github.com/keseljevicjovan/dotfiles). This allows easy changes without recompiling.
 
+# Live Reload
+
+#### dwm
+``` xdotool key super+F5 ```
+#### st
+``` pidof st | xargs kill -SIGUSR1 ```
+#### dmenu
+- it reloads colors by default with xresources patch 
 
 ## FAQ
 
