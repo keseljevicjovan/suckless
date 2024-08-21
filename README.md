@@ -34,7 +34,8 @@ Also available in the patches directories:
  - restoreafterrestart
  - scratchpad
  - swallow
- - xresources
+ - xrdb
+ - ~~xresources~~
 
 #### st
  - alpha
@@ -42,7 +43,8 @@ Also available in the patches directories:
  - columnredraw
  - scrollback
  - scrollback-mouse
- - xresources
+ - xst-xresources
+ - ~~xresources~~
 
 #### dmenu
  - alpha
