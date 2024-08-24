@@ -22,7 +22,7 @@ for i in ./*; do ( cd $i; sudo make install clean; cd .. ); done
 
 Also available in the patches directories:
 
-#### dwm (11)
+#### dwm (12)
  - actualfullscreen 
  - alpha
  - alwayscenter
@@ -35,7 +35,7 @@ Also available in the patches directories:
  - scratchpad
  - setborderpx
  - swallow
- - ~~xrdb~~
+ - xrdb
  - ~~xresources~~
 
 #### st (5)
