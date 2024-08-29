@@ -113,7 +113,8 @@ static const char *editor[] = { TERMINAL,"-e", "nvim", NULL };
 static const char *file_manager[] = { TERMINAL, "-e", "lfub", NULL};
 
 /* Colorscheme */
-static const char *dmenu_colorscheme[] = { "dmenu_change_colorscheme", NULL };
+static const char *dmenu_colorscheme[] = { "dmenu_change_colorscheme", "0", NULL };
+static const char *dmenu_colorscheme_full[] = { "dmenu_change_colorscheme", "1", NULL };
 
 /* Dmenu */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
@@ -135,6 +136,7 @@ static const Key keys[] = {
     { MODKEY,                       XK_s,                     spawn,            {.v = locker } },
     { MODKEY,                       XK_w,                     spawn,            {.v = dmenu_wallpaper } },
     { MODKEY,                       XK_c,                     spawn,            {.v = dmenu_colorscheme } },
+    { MODKEY|ControlMask,           XK_c,                     spawn,            {.v = dmenu_colorscheme_full } },
     { MODKEY|ShiftMask,             XK_b,                     togglebar,        {0} },
     { MODKEY,                       XK_j,                     focusstack,       {.i = +1 } },
     { MODKEY,                       XK_k,                     focusstack,       {.i = -1 } },
