@@ -65,7 +65,7 @@ Also available in the patches directories:
 
 ## Compatibily with XResources
 
-dwm and dmenu support XResources. For color schemes, scripts and configuration, see my [dotfiles](https://github.com/keseljevicjovan/dotfiles). This allows easy changes without recompiling.
+dwm, st and dmenu support XResources. For color schemes, scripts and configuration, see my [dotfiles](https://github.com/keseljevicjovan/dotfiles). This allows easy changes without recompiling.
 
 ## FAQ
 
