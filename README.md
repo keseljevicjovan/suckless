@@ -23,51 +23,48 @@ for i in ./*; do ( cd $i; sudo make install clean; cd .. ); done
 Also available in the patches directories:
 
 #### dwm (12)
- - actualfullscreen 
- - alpha
- - alwayscenter
- - fullgaps
- - fullscreen
- - movecenter
- - nomonocleborders
- - push_no_master
- - ~~restoreafterrestart~~
- - scratchpad
- - setborderpx
- - swallow
- - xrdb
- - ~~xresources~~
+ - [actualfullscreen](https://dwm.suckless.org/patches/actualfullscreen/) 
+ - [alpha](https://dwm.suckless.org/patches/alpha/)
+ - [alwayscenter](https://dwm.suckless.org/patches/alwayscenter/)
+ - [fullgaps](https://dwm.suckless.org/patches/fullgaps/)
+ - [fullscreen](https://dwm.suckless.org/patches/fullscreen/)
+ - [movecenter](https://dwm.suckless.org/patches/movecenter/)
+ - [nomonocleborders](https://github.com/keseljevicjovan/suckless/blob/main/dwm/patches/dwm-nomonocleborders-6.5.diff)
+ - [push_no_master](https://dwm.suckless.org/patches/push_no_master/)
+ - [~~restoreafterrestart~~](https://dwm.suckless.org/patches/restoreafterrestart/)
+ - [scratchpad](https://dwm.suckless.org/patches/scratchpad/)
+ - [setborderpx](https://dwm.suckless.org/patches/setborderpx/)
+ - [swallow](https://dwm.suckless.org/patches/swallow/)
+ - [xrdb](https://dwm.suckless.org/patches/xrdb/)
+ - [~~xresources~~](https://dwm.suckless.org/patches/xresources/)
 
 #### st (5)
- - alpha
- - boxdraw
- - columnredraw
- - scrollback
- - scrollback-mouse
- - ~~[xst-xresources](https://github.com/gavales/st/blob/master/diffs/xst-xresources-20200626.diff)~~
- - ~~xresources~~
+ - [alpha](https://st.suckless.org/patches/alpha)
+ - [boxdraw](https://st.suckless.org/patches/boxdraw)
+ - [columnredraw](https://st.suckless.org/patches/columnredraw)
+ - [scrollback](https://st.suckless.org/patches/scrollback)
+ - [scrollback-mouse](https://st.suckless.org/patches/scrollback)
+ - [~~xst-xresources~~](https://github.com/gavales/st/blob/master/diffs/xst-xresources-20200626.diff)
+ - [~~xresources~~](https://st.suckless.org/patches/scrollback-mouse)
 
-#### dmenu (4)
- - alpha
- - border
- - center
- - grid
- - ~~xresources~~
+#### dmenu (5)
+ - [alpha](https://tools.suckless.org/dmenu/patches/alpha)
+ - [border](https://tools.suckless.org/dmenu/patches/border)
+ - [center](https://tools.suckless.org/dmenu/patches/center)
+ - [grid](https://tools.suckless.org/dmenu/patches/grid)
+ - [~~xresources~~](https://tools.suckless.org/dmenu/patches/xresources)
+ - [xresources-alt](https://tools.suckless.org/dmenu/patches/xresources-alt)
 
 #### dwmblocks-async (0)
   - [ No patches ]
 
 #### slock (1)
- - dwmlogo
+ - [dwmlogo](https://tools.suckless.org/slock/patches/dwmlogo)
 
 
-## Compatibily with XResources (Removed)
+## Compatibily with XResources
 
-~~dwm, st, and dmenu support XResources. For color schemes, scripts and configuration, see my [dotfiles](https://github.com/keseljevicjovan/dotfiles). This allows easy changes without recompiling.~~
-
-However, relying on XResources led to some issues, such as dmenu failing to start if XResources were not loaded, or st displaying weird colors. After consideration, I've decided that it's better to have no feature than one that is poorly implemented. In future, I might develop a custom patch for live reload. 
-
-If you're interested in the live reload feature, you can refer to the [last commit where it was available](https://github.com/keseljevicjovan/suckless/tree/b01a0c37e6922890815be440dd65473d947171d4) or checkout [live-reload branch](https://github.com/keseljevicjovan/suckless/tree/live-reload).
+dwm and dmenu support XResources. For color schemes, scripts and configuration, see my [dotfiles](https://github.com/keseljevicjovan/dotfiles). This allows easy changes without recompiling.
 
 ## FAQ
 
