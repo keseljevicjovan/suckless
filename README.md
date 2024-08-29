@@ -38,13 +38,14 @@ Also available in the patches directories:
  - [xrdb](https://dwm.suckless.org/patches/xrdb/)
  - ~~[xresources](https://dwm.suckless.org/patches/xresources/)~~
 
-#### st (1)
+#### st (2)
  - [alpha](https://st.suckless.org/patches/alpha)
  - ~~[boxdraw](https://st.suckless.org/patches/boxdraw)~~
  - ~~[columnredraw](https://github.com/abhaysp95/st_custom/blob/master/patches/st-columnredraw-20210722-e40efda.diff)~~
  - ~~[scrollback](https://st.suckless.org/patches/scrollback)~~
  - ~~[scrollback-mouse](https://st.suckless.org/patches/scrollback)~~
  - ~~[xst-xresources](https://github.com/gavales/st/blob/master/diffs/xst-xresources-20200626.diff)~~
+ - [xresources-with-reload-signal](https://st.suckless.org/patches/xresources-with-reload-signal)
  - ~~[xresources](https://st.suckless.org/patches/xresources)~~
 
 #### dmenu (5)

@@ -1,0 +1,406 @@
+From 1bb14b1cd5b394fb6e777fce1316d5f788b20bea Mon Sep 17 00:00:00 2001
+From: MahdiMirzadeh <mahdi@mirzadeh.pro>
+Date: Wed, 9 Mar 2022 17:19:12 +0330
+Subject: [PATCH] handle st settings from Xresources + reload all st instances
+ by running 'pidof st | xargs kill -s USR1'
+
+---
+ arg.h |  50 -----------------------
+ st.h  | 128 ----------------------------------------------------------
+ win.h |  40 ------------------
+ x.c   | 126 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 126 insertions(+), 218 deletions(-)
+ delete mode 100644 arg.h
+ delete mode 100644 st.h
+ delete mode 100644 win.h
+
+diff --git a/arg.h b/arg.h
+deleted file mode 100644
+index a22e019..0000000
+--- a/arg.h
++++ /dev/null
+@@ -1,50 +0,0 @@
+-/*
+- * Copy me if you can.
+- * by 20h
+- */
+-
+-#ifndef ARG_H__
+-#define ARG_H__
+-
+-extern char *argv0;
+-
+-/* use main(int argc, char *argv[]) */
+-#define ARGBEGIN	for (argv0 = *argv, argv++, argc--;\
+-					argv[0] && argv[0][0] == '-'\
+-					&& argv[0][1];\
+-					argc--, argv++) {\
+-				char argc_;\
+-				char **argv_;\
+-				int brk_;\
+-				if (argv[0][1] == '-' && argv[0][2] == '\0') {\
+-					argv++;\
+-					argc--;\
+-					break;\
+-				}\
+-				int i_;\
+-				for (i_ = 1, brk_ = 0, argv_ = argv;\
+-						argv[0][i_] && !brk_;\
+-						i_++) {\
+-					if (argv_ != argv)\
+-						break;\
+-					argc_ = argv[0][i_];\
+-					switch (argc_)
+-
+-#define ARGEND			}\
+-			}
+-
+-#define ARGC()		argc_
+-
+-#define EARGF(x)	((argv[0][i_+1] == '\0' && argv[1] == NULL)?\
+-				((x), abort(), (char *)0) :\
+-				(brk_ = 1, (argv[0][i_+1] != '\0')?\
+-					(&argv[0][i_+1]) :\
+-					(argc--, argv++, argv[0])))
+-
+-#define ARGF()		((argv[0][i_+1] == '\0' && argv[1] == NULL)?\
+-				(char *)0 :\
+-				(brk_ = 1, (argv[0][i_+1] != '\0')?\
+-					(&argv[0][i_+1]) :\
+-					(argc--, argv++, argv[0])))
+-
+-#endif
+diff --git a/st.h b/st.h
+deleted file mode 100644
+index 519b9bd..0000000
+--- a/st.h
++++ /dev/null
+@@ -1,128 +0,0 @@
+-/* See LICENSE for license details. */
+-
+-#include <stdint.h>
+-#include <sys/types.h>
+-
+-/* macros */
+-#define MIN(a, b)		((a) < (b) ? (a) : (b))
+-#define MAX(a, b)		((a) < (b) ? (b) : (a))
+-#define LEN(a)			(sizeof(a) / sizeof(a)[0])
+-#define BETWEEN(x, a, b)	((a) <= (x) && (x) <= (b))
+-#define DIVCEIL(n, d)		(((n) + ((d) - 1)) / (d))
+-#define DEFAULT(a, b)		(a) = (a) ? (a) : (b)
+-#define LIMIT(x, a, b)		(x) = (x) < (a) ? (a) : (x) > (b) ? (b) : (x)
+-#define ATTRCMP(a, b)		((a).mode != (b).mode || (a).fg != (b).fg || \
+-				(a).bg != (b).bg)
+-#define TIMEDIFF(t1, t2)	((t1.tv_sec-t2.tv_sec)*1000 + \
+-				(t1.tv_nsec-t2.tv_nsec)/1E6)
+-#define MODBIT(x, set, bit)	((set) ? ((x) |= (bit)) : ((x) &= ~(bit)))
+-
+-#define TRUECOLOR(r,g,b)	(1 << 24 | (r) << 16 | (g) << 8 | (b))
+-#define IS_TRUECOL(x)		(1 << 24 & (x))
+-
+-enum glyph_attribute {
+-	ATTR_NULL       = 0,
+-	ATTR_BOLD       = 1 << 0,
+-	ATTR_FAINT      = 1 << 1,
+-	ATTR_ITALIC     = 1 << 2,
+-	ATTR_UNDERLINE  = 1 << 3,
+-	ATTR_BLINK      = 1 << 4,
+-	ATTR_REVERSE    = 1 << 5,
+-	ATTR_INVISIBLE  = 1 << 6,
+-	ATTR_STRUCK     = 1 << 7,
+-	ATTR_WRAP       = 1 << 8,
+-	ATTR_WIDE       = 1 << 9,
+-	ATTR_WDUMMY     = 1 << 10,
+-	ATTR_BOLD_FAINT = ATTR_BOLD | ATTR_FAINT,
+-};
+-
+-enum selection_mode {
+-	SEL_IDLE = 0,
+-	SEL_EMPTY = 1,
+-	SEL_READY = 2
+-};
+-
+-enum selection_type {
+-	SEL_REGULAR = 1,
+-	SEL_RECTANGULAR = 2
+-};
+-
+-enum selection_snap {
+-	SNAP_WORD = 1,
+-	SNAP_LINE = 2
+-};
+-
+-typedef unsigned char uchar;
+-typedef unsigned int uint;
+-typedef unsigned long ulong;
+-typedef unsigned short ushort;
+-
+-typedef uint_least32_t Rune;
+-
+-#define Glyph Glyph_
+-typedef struct {
+-	Rune u;           /* character code */
+-	ushort mode;      /* attribute flags */
+-	uint32_t fg;      /* foreground  */
+-	uint32_t bg;      /* background  */
+-} Glyph;
+-
+-typedef Glyph *Line;
+-
+-typedef union {
+-	int i;
+-	uint ui;
+-	float f;
+-	const void *v;
+-	const char *s;
+-} Arg;
+-
+-void die(const char *, ...);
+-void redraw(void);
+-void draw(void);
+-
+-void printscreen(const Arg *);
+-void printsel(const Arg *);
+-void sendbreak(const Arg *);
+-void toggleprinter(const Arg *);
+-
+-int tattrset(int);
+-void tnew(int, int);
+-void tresize(int, int);
+-void tsetdirtattr(int);
+-void ttyhangup(void);
+-int ttynew(const char *, char *, const char *, char **);
+-size_t ttyread(void);
+-void ttyresize(int, int);
+-void ttywrite(const char *, size_t, int);
+-
+-void resettitle(void);
+-
+-void selclear(void);
+-void selinit(void);
+-void selstart(int, int, int);
+-void selextend(int, int, int, int);
+-int selected(int, int);
+-char *getsel(void);
+-
+-size_t utf8encode(Rune, char *);
+-
+-void *xmalloc(size_t);
+-void *xrealloc(void *, size_t);
+-char *xstrdup(const char *);
+-
+-int xgetcolor(int x, unsigned char *r, unsigned char *g, unsigned char *b);
+-
+-/* config.h globals */
+-extern char *utmp;
+-extern char *scroll;
+-extern char *stty_args;
+-extern char *vtiden;
+-extern wchar_t *worddelimiters;
+-extern int allowaltscreen;
+-extern int allowwindowops;
+-extern char *termname;
+-extern unsigned int tabspaces;
+-extern unsigned int defaultfg;
+-extern unsigned int defaultbg;
+-extern unsigned int defaultcs;
+diff --git a/win.h b/win.h
+deleted file mode 100644
+index e6e4369..0000000
+--- a/win.h
++++ /dev/null
+@@ -1,40 +0,0 @@
+-/* See LICENSE for license details. */
+-
+-enum win_mode {
+-	MODE_VISIBLE     = 1 << 0,
+-	MODE_FOCUSED     = 1 << 1,
+-	MODE_APPKEYPAD   = 1 << 2,
+-	MODE_MOUSEBTN    = 1 << 3,
+-	MODE_MOUSEMOTION = 1 << 4,
+-	MODE_REVERSE     = 1 << 5,
+-	MODE_KBDLOCK     = 1 << 6,
+-	MODE_HIDE        = 1 << 7,
+-	MODE_APPCURSOR   = 1 << 8,
+-	MODE_MOUSESGR    = 1 << 9,
+-	MODE_8BIT        = 1 << 10,
+-	MODE_BLINK       = 1 << 11,
+-	MODE_FBLINK      = 1 << 12,
+-	MODE_FOCUS       = 1 << 13,
+-	MODE_MOUSEX10    = 1 << 14,
+-	MODE_MOUSEMANY   = 1 << 15,
+-	MODE_BRCKTPASTE  = 1 << 16,
+-	MODE_NUMLOCK     = 1 << 17,
+-	MODE_MOUSE       = MODE_MOUSEBTN|MODE_MOUSEMOTION|MODE_MOUSEX10\
+-	                  |MODE_MOUSEMANY,
+-};
+-
+-void xbell(void);
+-void xclipcopy(void);
+-void xdrawcursor(int, int, Glyph, int, int, Glyph);
+-void xdrawline(Line, int, int, int);
+-void xfinishdraw(void);
+-void xloadcols(void);
+-int xsetcolorname(int, const char *);
+-void xseticontitle(char *);
+-void xsettitle(char *);
+-int xsetcursor(int);
+-void xsetmode(int, unsigned int);
+-void xsetpointermotion(int);
+-void xsetsel(char *);
+-int xstartdraw(void);
+-void xximspot(int, int);
+diff --git a/x.c b/x.c
+index cd96575..2771033 100644
+--- a/x.c
++++ b/x.c
+@@ -14,6 +14,7 @@
+ #include <X11/keysym.h>
+ #include <X11/Xft/Xft.h>
+ #include <X11/XKBlib.h>
++#include <X11/Xresource.h>
+ 
+ char *argv0;
+ #include "arg.h"
+@@ -2011,6 +2012,129 @@ run(void)
+ 	}
+ }
+ 
++#define XRESOURCE_LOAD_META(NAME)					\
++	if(!XrmGetResource(xrdb, "st." NAME, "st." NAME, &type, &ret))	\
++		XrmGetResource(xrdb, "*." NAME, "*." NAME, &type, &ret); \
++	if (ret.addr != NULL && !strncmp("String", type, 64))
++
++#define XRESOURCE_LOAD_STRING(NAME, DST)	\
++	XRESOURCE_LOAD_META(NAME)		\
++		DST = ret.addr;
++
++#define XRESOURCE_LOAD_CHAR(NAME, DST)		\
++	XRESOURCE_LOAD_META(NAME)		\
++		DST = ret.addr[0];
++
++#define XRESOURCE_LOAD_INTEGER(NAME, DST)		\
++	XRESOURCE_LOAD_META(NAME)			\
++		DST = strtoul(ret.addr, NULL, 10);
++
++#define XRESOURCE_LOAD_FLOAT(NAME, DST)		\
++	XRESOURCE_LOAD_META(NAME)		\
++		DST = strtof(ret.addr, NULL);
++
++void
++xrdb_load(void)
++{
++	/* XXX */
++	char *xrm;
++	char *type;
++	XrmDatabase xrdb;
++	XrmValue ret;
++	Display *dpy;
++
++	if(!(dpy = XOpenDisplay(NULL)))
++		die("Can't open display\n");
++
++	XrmInitialize();
++	xrm = XResourceManagerString(dpy);
++
++	if (xrm != NULL) {
++		xrdb = XrmGetStringDatabase(xrm);
++
++		/* handling colors here without macros to do via loop. */
++		int i = 0;
++		char loadValue[12] = "";
++		for (i = 0; i < 256; i++)
++		{
++			sprintf(loadValue, "%s%d", "st.color", i);
++
++			if(!XrmGetResource(xrdb, loadValue, loadValue, &type, &ret))
++			{
++				sprintf(loadValue, "%s%d", "*.color", i);
++				if (!XrmGetResource(xrdb, loadValue, loadValue, &type, &ret))
++					/* reset if not found (unless in range for defaults). */
++					if (i > 15)
++						colorname[i] = NULL;
++			}
++
++			if (ret.addr != NULL && !strncmp("String", type, 64))
++				colorname[i] = ret.addr;
++		}
++
++		XRESOURCE_LOAD_STRING("foreground", colorname[defaultfg]);
++		XRESOURCE_LOAD_STRING("background", colorname[defaultbg]);
++		XRESOURCE_LOAD_STRING("cursorfg", colorname[defaultcs])
++		else {
++		  // this looks confusing because we are chaining off of the if
++		  // in the macro. probably we should be wrapping everything blocks
++		  // so this isn't possible...
++		  defaultcs = defaultfg;
++		}
++		XRESOURCE_LOAD_STRING("reverse-cursor", colorname[defaultrcs])
++		else {
++		  // see above.
++		  defaultrcs = defaultbg;
++		}
++
++		XRESOURCE_LOAD_STRING("font", font);
++		XRESOURCE_LOAD_STRING("termname", termname);
++
++		/* XRESOURCE_LOAD_INTEGER("xfps", xfps); */
++		/* XRESOURCE_LOAD_INTEGER("actionfps", actionfps); */
++		XRESOURCE_LOAD_INTEGER("blinktimeout", blinktimeout);
++		XRESOURCE_LOAD_INTEGER("bellvolume", bellvolume);
++		XRESOURCE_LOAD_INTEGER("borderpx", borderpx);
++		/* XRESOURCE_LOAD_INTEGER("borderless", borderless); */
++		XRESOURCE_LOAD_INTEGER("cursorshape", cursorshape);
++
++		/* cursorblinkstate = 1; // in case if cursor shape was changed from a blinking one to a non-blinking */
++		/* XRESOURCE_LOAD_INTEGER("cursorthickness", cursorthickness); */
++		/* XRESOURCE_LOAD_INTEGER("cursorblinkstyle", cursorblinkstyle); */
++		/* XRESOURCE_LOAD_INTEGER("cursorblinkontype", cursorblinkontype); */
++
++		/* todo: https://github.com/gnotclub/xst/commit/1e82647b0e04077e975679a4b4cf1eb02b04e6bc */
++		/* XRESOURCE_LOAD_INTEGER("mouseScrollLines", mousescrolllines); */
++
++		XRESOURCE_LOAD_FLOAT("cwscale", cwscale);
++		XRESOURCE_LOAD_FLOAT("chscale", chscale);
++
++		/* XRESOURCE_LOAD_CHAR("prompt_char", prompt_char); */
++	}
++	XFlush(dpy);
++}
++
++void
++reload(int sig)
++{
++	xrdb_load();
++
++	/* colors, fonts */
++	xloadcols();
++	xunloadfonts();
++	xloadfonts(font, 0);
++
++	/* pretend the window just got resized */
++	cresize(win.w, win.h);
++
++	redraw();
++
++	/* triggers re-render if we're visible. */
++	ttywrite("\033[O", 3, 1);
++
++	signal(SIGUSR1, reload);
++}
++
+ void
+ usage(void)
+ {
+@@ -2084,6 +2208,8 @@ run:
+ 
+ 	setlocale(LC_CTYPE, "");
+ 	XSetLocaleModifiers("");
++	xrdb_load();
++	signal(SIGUSR1, reload);
+ 	cols = MAX(cols, 1);
+ 	rows = MAX(rows, 1);
+ 	tnew(cols, rows);
+-- 
+2.35.1
+
