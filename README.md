@@ -38,9 +38,9 @@ Also available in the patches directories:
  - [xrdb](https://dwm.suckless.org/patches/xrdb/)
  - ~~[xresources](https://dwm.suckless.org/patches/xresources/)~~
 
-#### st (2)
+#### st (3)
  - [alpha](https://st.suckless.org/patches/alpha)
- - ~~[boxdraw](https://st.suckless.org/patches/boxdraw)~~
+ - [boxdraw](https://st.suckless.org/patches/boxdraw)
  - ~~[columnredraw](https://github.com/abhaysp95/st_custom/blob/master/patches/st-columnredraw-20210722-e40efda.diff)~~
  - ~~[scrollback](https://st.suckless.org/patches/scrollback)~~
  - ~~[scrollback-mouse](https://st.suckless.org/patches/scrollback)~~
