@@ -22,7 +22,7 @@ for i in ./*; do ( cd $i; sudo make install clean; cd .. ); done
 
 Also available in the patches directories:
 
-#### dwm (12)
+#### dwm (13)
  - [actualfullscreen](https://dwm.suckless.org/patches/actualfullscreen/) 
  - [alpha](https://dwm.suckless.org/patches/alpha/)
  - [alwayscenter](https://dwm.suckless.org/patches/alwayscenter/)
@@ -34,6 +34,7 @@ Also available in the patches directories:
  - ~~[restoreafterrestart](https://dwm.suckless.org/patches/restoreafterrestart/)~~
  - [scratchpad](https://dwm.suckless.org/patches/scratchpad/)
  - [setborderpx](https://dwm.suckless.org/patches/setborderpx/)
+ - [statusallmons](https://dwm.suckless.org/patches/statusallmons/)
  - [swallow](https://dwm.suckless.org/patches/swallow/)
  - [xrdb](https://dwm.suckless.org/patches/xrdb/)
  - ~~[xresources](https://dwm.suckless.org/patches/xresources/)~~
