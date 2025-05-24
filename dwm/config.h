@@ -41,6 +41,7 @@ static const Rule rules[] = {
 //{ "Gimp",         NULL,     NULL,           0,         1,          0,           0,        -1 },
 //{ "Firefox",      NULL,     NULL,           1 << 8,    0,          0,          -1,        -1 },
   { "st-256color",  NULL,     NULL,           0,         0,          1,           0,        -1 },	
+  { "Nsxiv",        NULL,     NULL,           0,         1,          0,           0,        -1 },	
   { NULL,           NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
 };
 
@@ -101,7 +102,8 @@ static const char *dmenu_keyboard_layout[] = { "dmenu_change_keyboard_layout", N
 static const char *locker[] = { "slock", NULL };
 
 /* Wallpaper */
-static const char *dmenu_wallpaper[] = { "dmenu_change_wallpaper", NULL };
+static const char *dmenu_wallpaper[] = { "change_wallpaper", NULL };
+static const char *nsxiv_wallpaper[] = { "change_wallpaper", "nsxiv", NULL };
 
 /* Web Browser */
 static const char *browser[] = { "firefox", NULL };
@@ -135,6 +137,7 @@ static const Key keys[] = {
   { MODKEY|ControlMask,           XK_p,                     spawn,            {.v = start_picom } },
   { MODKEY,                       XK_s,                     spawn,            {.v = locker } },
   { MODKEY,                       XK_w,                     spawn,            {.v = dmenu_wallpaper } },
+  { MODKEY|ShiftMask,             XK_w,                     spawn,            {.v = nsxiv_wallpaper } },
   { MODKEY,                       XK_c,                     spawn,            {.v = dmenu_colorscheme } },
   { MODKEY|ControlMask,           XK_c,                     spawn,            {.v = dmenu_colorscheme_full } },
   { MODKEY|ShiftMask,             XK_b,                     togglebar,        {0} },
