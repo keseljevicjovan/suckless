@@ -117,7 +117,7 @@ static const char *win_res(XrmDatabase db, const char *name, const char *def)
 void win_init(win_t *win)
 {
 	win_env_t *e;
-	const char *win_bg, *win_fg, *mrk_fg;
+	const char *win_bg, *win_fg, *mrk_fg, *win_alpha;
 	char *res_man;
 	XrmDatabase db;
 #if HAVE_LIBFONTS
@@ -125,7 +125,9 @@ void win_init(win_t *win)
 
 	static char lbuf[512 + UTF8_PADDING], rbuf[64 + UTF8_PADDING];
 #endif
-
+	XVisualInfo vis;
+	float alpha;
+	char *endptr;
 	memset(win, 0, sizeof(*win));
 
 	e = &win->env;
@@ -135,9 +137,16 @@ void win_init(win_t *win)
 	e->scr = DefaultScreen(e->dpy);
 	e->scrw = DisplayWidth(e->dpy, e->scr);
 	e->scrh = DisplayHeight(e->dpy, e->scr);
-	e->depth = DefaultDepth(e->dpy, e->scr);
-	e->vis = DefaultVisual(e->dpy, e->scr);
-	e->cmap = DefaultColormap(e->dpy, e->scr);
+
+	if (XMatchVisualInfo(e->dpy, e->scr, 32, TrueColor, &vis)) {
+		e->depth = 32;
+		e->vis = vis.visual;
+		e->cmap = XCreateColormap(e->dpy, DefaultRootWindow(e->dpy), e->vis, None);
+	} else {
+		e->depth = DefaultDepth(e->dpy, e->scr);
+		e->vis = DefaultVisual(e->dpy, e->scr);
+		e->cmap = DefaultColormap(e->dpy, e->scr);
+	}
 
 	if (setlocale(LC_CTYPE, "") == NULL || XSupportsLocale() == 0)
 		error(0, 0, "No locale support");
@@ -152,6 +161,25 @@ void win_init(win_t *win)
 	win_alloc_color(e, win_bg, &win->win_bg);
 	win_alloc_color(e, win_fg, &win->win_fg);
 	win_alloc_color(e, mrk_fg, &win->mrk_fg);
+
+	/* apply alpha */
+	win->win_bg_postmul = win->win_bg;
+	win_alpha = win_res(db, RES_CLASS ".window.alpha", "1.0");
+	alpha = strtof(win_alpha, &endptr);
+	if (!(*endptr == '\0' && alpha >= 0.0 && alpha <= 1.0))
+		error(EXIT_FAILURE, 0, "Error parsing alpha");
+	win->win_alpha = 0xFF;
+	if (e->depth == 32 && alpha < 1.0) {
+		win->win_alpha *= alpha;
+		win->win_bg.red *= alpha;
+		win->win_bg.green *= alpha;
+		win->win_bg.blue *= alpha;
+		win->win_bg.pixel =
+			(((unsigned long) win->win_bg.blue  >> 8) <<  0) |
+			(((unsigned long) win->win_bg.green >> 8) <<  8) |
+			(((unsigned long) win->win_bg.red   >> 8) << 16) |
+			(((unsigned long) win->win_alpha        ) << 24);
+	}
 
 #if HAVE_LIBFONTS
 	bar_bg = win_res(db, BAR_BG[0], BAR_BG[1] ? BAR_BG[1] : win_bg);

@@ -64,8 +64,8 @@ Also available in the patches directories:
 #### slock (1)
  - [dwmlogo](https://tools.suckless.org/slock/patches/dwmlogo)
 
-#### nsxiv (0)
- - [ No patches ]
+#### nsxiv (1)
+ - [alpha](https://github.com/nsxiv/nsxiv-extra/tree/master/patches/alpha)
 
 ## Compatibily with XResources
 
