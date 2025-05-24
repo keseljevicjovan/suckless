@@ -6,7 +6,8 @@ This repository is used for personal builds of suckless software. It includes:
 - simple terminal ([suckless link](https://st.suckless.org))
 - dmenu ([suckless link](https://tools.suckless.org/dmenu))
 - dwmblocks-async ([github link](https://github.com/UtkarshVerma/dwmblocks-async))
-- simple lock ([suckless link](https://tools.suckless.org/slock))
+- slock ([suckless link](https://tools.suckless.org/slock))
+- nsxiv ([github link](https://github.com/nsxiv/nsxiv)) ([codeberg link](https://codeberg.org/nsxiv/nsxiv))
 
 ## Installation
 
@@ -63,10 +64,12 @@ Also available in the patches directories:
 #### slock (1)
  - [dwmlogo](https://tools.suckless.org/slock/patches/dwmlogo)
 
+#### nsxiv (0)
+ - [ No patches ]
 
 ## Compatibily with XResources
 
-dwm, st and dmenu support XResources. For color schemes, scripts and configuration, see my [dotfiles](https://github.com/keseljevicjovan/dotfiles). This allows easy changes without recompiling.
+dwm, st, dmenu and nsxiv support XResources. For color schemes, scripts and configuration, see my [dotfiles](https://github.com/keseljevicjovan/dotfiles). This allows easy changes without recompiling.
 
 ## FAQ
 
