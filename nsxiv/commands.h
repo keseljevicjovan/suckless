@@ -23,6 +23,7 @@ bool cg_toggle_fullscreen(arg_t);
 bool cg_toggle_image_mark(arg_t);
 bool cg_unmark_all(arg_t);
 bool cg_zoom(arg_t);
+bool cg_dmenu_search(arg_t);
 /* image mode */
 bool ci_alternate(arg_t);
 bool ci_cursor_navigate(arg_t);
@@ -69,6 +70,7 @@ bool ct_select(arg_t);
 #define g_toggle_image_mark { cg_toggle_image_mark, MODE_ALL }
 #define g_unmark_all { cg_unmark_all, MODE_ALL }
 #define g_zoom { cg_zoom, MODE_ALL }
+#define g_dmenu_search { cg_dmenu_search, MODE_ALL }
 
 /* image mode */
 #define i_alternate { ci_alternate, MODE_IMAGE }
