@@ -13,10 +13,11 @@ static char normbgcolor[] = "#222222";
 static char selfgcolor[]  = "#eeeeee";
 static char selbgcolor[]  = "#005577";
 static const char *colors[SchemeLast][2] = {
-	/*               fg           bg       */
-	[SchemeNorm] = { normfgcolor, normbgcolor },
-	[SchemeSel]  = { selfgcolor,  selbgcolor  },
-	[SchemeOut]  = { "#000000",   "#00ffff" },
+	/*                 fg           bg       */
+	[SchemeNorm]   = { normfgcolor, normbgcolor },
+	[SchemeSel]    = { selfgcolor,  selbgcolor  },
+	[SchemeOut]    = { "#000000",   "#00ffff"   },
+  [SchemeCursor] = { "#222222",   "#bbbbbb"   }
 };
 
 static const unsigned int alphas[SchemeLast][2] = {
@@ -33,6 +34,19 @@ static unsigned int columns    = 0;
  * for example: " /?\"&[]"
  */
 static const char worddelimiters[] = " ";
+
+/*
+ * -vi option; if nonzero, vi mode is always enabled and can be
+ * accessed with the global_esc keysym + mod mask
+ */
+static unsigned int vi_mode = 1;
+static unsigned int start_mode = 0;			/* mode to use when -vi is passed. 0 = insert mode, 1 = normal mode */
+static Key global_esc = { XK_n, Mod1Mask };	/* escape key when vi mode is not enabled explicitly */
+static Key quit_keys[] = {
+	/* keysym	modifier */
+	{ XK_q,		0 }
+};
+
 
 /* Size of the window border */
 static const unsigned int border_width = 5;
