@@ -118,6 +118,12 @@ static const char *file_manager[] = { TERMINAL, "-e", "zsh", "-ic", "source ~/.z
 static const char *dmenu_colorscheme[] = { "dmenu_change_colorscheme", "0", NULL };
 static const char *dmenu_colorscheme_full[] = { "dmenu_change_colorscheme", "1", NULL };
 
+/* Games */
+static const char *dmenu_game[] = { "select_game", NULL };
+
+/* Emojis */
+static const char *dmenu_emoji[] = { "dmenu_unicode", NULL };
+
 /* Dmenu */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-vi", "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
@@ -140,6 +146,8 @@ static const Key keys[] = {
   { MODKEY|ShiftMask,             XK_w,                     spawn,            {.v = nsxiv_wallpaper } },
   { MODKEY,                       XK_c,                     spawn,            {.v = dmenu_colorscheme } },
   { MODKEY|ControlMask,           XK_c,                     spawn,            {.v = dmenu_colorscheme_full } },
+  { MODKEY|ControlMask,           XK_e,                     spawn,            {.v = dmenu_emoji } },
+  { MODKEY,                       XK_g,                     spawn,            {.v = dmenu_game } },
   { MODKEY|ShiftMask,             XK_b,                     togglebar,        {0} },
   { MODKEY,                       XK_j,                     focusstack,       {.i = +1 } },
   { MODKEY,                       XK_k,                     focusstack,       {.i = -1 } },
