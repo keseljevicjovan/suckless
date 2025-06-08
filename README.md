@@ -2,12 +2,12 @@
 
 This repository is used for personal builds of suckless software. It includes:
 
-- dynamic window manager ([suckless link](https://dwm.suckless.org)) 
-- simple terminal ([suckless link](https://st.suckless.org))
-- dmenu ([suckless link](https://tools.suckless.org/dmenu))
-- dwmblocks-async ([github link](https://github.com/UtkarshVerma/dwmblocks-async))
-- slock ([suckless link](https://tools.suckless.org/slock))
-- nsxiv ([github link](https://github.com/nsxiv/nsxiv)) ([codeberg link](https://codeberg.org/nsxiv/nsxiv))
+- dynamic window manager ([suckless.org](https://dwm.suckless.org)) 
+- simple terminal ([suckless.org](https://st.suckless.org))
+- dmenu ([suckless.org](https://tools.suckless.org/dmenu))
+- dwmblocks-async ([github.com](https://github.com/UtkarshVerma/dwmblocks-async))
+- slock ([suckless.org](https://tools.suckless.org/slock))
+- nsxiv ([github.com](https://github.com/nsxiv/nsxiv)) ([codeberg.org](https://codeberg.org/nsxiv/nsxiv))
 
 ## Installation
 
@@ -63,8 +63,8 @@ Also available in the patches directories:
 #### dwmblocks-async (0)
   - [ No patches ]
 
-#### slock (1)
- - [dwmlogo](https://tools.suckless.org/slock/patches/dwmlogo)
+#### slock (0)
+ - ~~[dwmlogo](https://tools.suckless.org/slock/patches/dwmlogo)~~
 
 #### nsxiv (2)
  - [alpha](https://github.com/nsxiv/nsxiv-extra/tree/master/patches/alpha)
