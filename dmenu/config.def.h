@@ -2,6 +2,7 @@
 /* Default settings; can be overriden by command line. */
 
 static int topbar = 1;                      /* -b  option; if 0, dmenu appears at bottom     */
+static int fuzzy  = 1;                      /* -F  option; if 0, dmenu doesn't use fuzzy matching */
 static const unsigned int alpha = 0xff;     /* Amount of opacity. 0xff is opaque             */
 /* -fn option overrides fonts[0]; default X11 font or font set */
 static const char *fonts[] = {
@@ -46,10 +47,6 @@ static Key quit_keys[] = {
 	/* keysym	modifier */
 	{ XK_q,		0 }
 };
-
-
-/* Size of the window border */
-static const unsigned int border_width = 5;
 
 /*
  * Xresources preferences to load at startup
