@@ -50,8 +50,8 @@ Also available in the patches directories:
  - [xresources-with-reload-signal](https://st.suckless.org/patches/xresources-with-reload-signal)
  - ~~[xresources](https://st.suckless.org/patches/xresources)~~
 
-#### dmenu (5)
- - [alpha](https://tools.suckless.org/dmenu/patches/alpha)
+#### dmenu (4)
+ - ~~[alpha](https://tools.suckless.org/dmenu/patches/alpha)~~
  - ~~[border](https://tools.suckless.org/dmenu/patches/border)~~
  - ~~[center](https://tools.suckless.org/dmenu/patches/center)~~
  - [grid](https://tools.suckless.org/dmenu/patches/grid)
@@ -63,11 +63,12 @@ Also available in the patches directories:
 #### dwmblocks-async (0)
   - [ No patches ]
 
-#### slock (1)
+#### slock (2)
  - [dwmlogo](https://tools.suckless.org/slock/patches/dwmlogo)
 
-#### nsxiv (1)
+#### nsxiv (2)
  - [alpha](https://github.com/nsxiv/nsxiv-extra/tree/master/patches/alpha)
+ - [dmenu-search](https://github.com/nsxiv/nsxiv-extra/tree/master/patches/dmenu-search)
 
 ## Compatibily with XResources
 
