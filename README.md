@@ -63,7 +63,7 @@ Also available in the patches directories:
 #### dwmblocks-async (0)
   - [ No patches ]
 
-#### slock (2)
+#### slock (1)
  - [dwmlogo](https://tools.suckless.org/slock/patches/dwmlogo)
 
 #### nsxiv (2)
