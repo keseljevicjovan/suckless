@@ -63,8 +63,9 @@ Also available in the patches directories:
 #### dwmblocks-async (0)
   - [ No patches ]
 
-#### slock (0)
+#### slock (1)
  - ~~[dwmlogo](https://tools.suckless.org/slock/patches/dwmlogo)~~
+ - [background-image](https://tools.suckless.org/slock/patches/background-image)
 
 #### nsxiv (2)
  - [alpha](https://github.com/nsxiv/nsxiv-extra/tree/master/patches/alpha)
