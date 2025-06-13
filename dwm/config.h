@@ -69,7 +69,6 @@ static const Layout layouts[] = {
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
-
 /* Terminal Emulator */
 #define TERMINAL "st"
 static const char *termcmd[]  = { TERMINAL, NULL };
@@ -124,6 +123,10 @@ static const char *dmenu_game[] = { "select_game", NULL };
 /* Emojis */
 static const char *dmenu_emoji[] = { "dmenu_unicode", NULL };
 
+/* Clip History */
+static const char *dmenu_clipboard_copy[] = { "dmenu_clipboard", "save", NULL };
+static const char *dmenu_clipboard_paste[] = { "dmenu_clipboard", "select", NULL };
+ 
 /* Dmenu */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-vi", "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
@@ -144,10 +147,12 @@ static const Key keys[] = {
   { MODKEY,                       XK_s,                     spawn,            {.v = locker } },
   { MODKEY,                       XK_w,                     spawn,            {.v = nsxiv_wallpaper } },
   { MODKEY|ShiftMask,             XK_w,                     spawn,            {.v = dmenu_wallpaper } },
-  { MODKEY,                       XK_c,                     spawn,            {.v = dmenu_colorscheme } },
+  { MODKEY|ShiftMask,             XK_c,                     spawn,            {.v = dmenu_colorscheme } },
   { MODKEY|ControlMask,           XK_c,                     spawn,            {.v = dmenu_colorscheme_full } },
   { MODKEY|ControlMask,           XK_e,                     spawn,            {.v = dmenu_emoji } },
   { MODKEY,                       XK_g,                     spawn,            {.v = dmenu_game } },
+  { MODKEY,                       XK_c,                     spawn,            {.v = dmenu_clipboard_copy } },
+  { MODKEY,                       XK_v,                     spawn,            {.v = dmenu_clipboard_paste } },
   { MODKEY|ShiftMask,             XK_b,                     togglebar,        {0} },
   { MODKEY,                       XK_j,                     focusstack,       {.i = +1 } },
   { MODKEY,                       XK_k,                     focusstack,       {.i = -1 } },
@@ -165,8 +170,8 @@ static const Key keys[] = {
   { MODKEY,                       XK_t,                     setlayout,        {.v = &layouts[0]} },
   { MODKEY,                       XK_f,                     setlayout,        {.v = &layouts[1]} },
   { MODKEY,                       XK_m,                     setlayout,        {.v = &layouts[2]} },
-  { MODKEY|ShiftMask,             XK_v,                     setlayout,        {0} },
-  { MODKEY,                       XK_v,                     togglefloating,   {0} },
+//{ MODKEY|ShiftMask,             XK_v,                     setlayout,        {0} },
+  { MODKEY|ShiftMask,             XK_v,                     togglefloating,   {0} },
   { MODKEY|ShiftMask,             XK_f,                     togglefullscr,    {0} },
   { MODKEY|ControlMask,           XK_f,                     fullscreen,       {0} },
   { MODKEY,                       XK_0,                     view,             {.ui = ~0 } },
