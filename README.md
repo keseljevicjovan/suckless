@@ -13,10 +13,10 @@ This repository is used for personal builds of suckless software. It includes:
 
 Clone the repository and build all software:
 
-```
+```sh
 git clone https://github.com/keseljevicjovan/suckless
-cd suckless
-for i in ./*; do ( cd $i; sudo make install clean; cd .. ); done
+sed -i "s|jovan|$(whoami)|g" suckless/slock/config.h
+for i in ./suckless/*; do ( cd $i; sudo make install clean; cd .. ); done
 ```
 
 ## Patches
@@ -77,14 +77,35 @@ dwm, st, dmenu and nsxiv support XResources. For color schemes, scripts and conf
 
 ## FAQ
 
-#### Q: How do I change keybindings/colors/fonts ?
-A: Open config.h (not config.def.h), edit it, compile with ```sudo make install clean``` and then restart program. 
+#### Q: How do I change keybindings/colors/fonts?
+A: Open config.h (not config.def.h), edit it, then compile with 
+```sh 
+sudo make install clean
+```
+And restart the program to apply the changes.
 
-#### Q: My status bar is not showing any modules ?
-A: Because it's not included directly in dwmblocks. You need to get status bar scripts (here is [link](https://github.com/keseljevicjovan/dotfiles/tree/main/.local/bin/statusbar) for mine), and then put location to them in $PATH.
+#### Q: My status bar is not showing any modules?
+A: The modules aren’t included directly in dwmblocks. You need to download status bar scripts (here is [link](https://github.com/keseljevicjovan/dotfiles/tree/main/.local/bin/statusbar) for mine) and add their location to your $PATH.
 
-#### Q: Why suckless software ?
+#### Q: Why suckless software?
 A: Because it [sucks less](https://suckless.org/philosophy/).
 
 #### Q: I use login manager, how do I start dwm?
-A: Make dwm.desktop entry, put it in /usr/share/xsessions/, and select it in sessions.
+A: Create a dwm.desktop file and place it in /usr/local/share/xsessions/. Then select dwm from your login session options.
+
+Here is an example of the dwm.desktop file:
+```desktop
+[Desktop Entry]
+Name=dwm
+Comment=Dynamic Window Manager
+Exec=/home/YOUR_USERNAME/.config/X11/xinit/dwm/xinitrc
+Type=XSession
+```
+
+#### Q: How do I troubleshoot build errors?
+A: Make sure you have all necessary packages installed for your system.
+
+For Arch-based distros, use pacman:
+```sh
+sudo pacman -Syu base-devel libx11 libxft libxinerama libxrandr libxext libxrender fontconfig freetype2 libexif imlib2 shadow
+```

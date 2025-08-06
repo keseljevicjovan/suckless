@@ -5,7 +5,7 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "JetBrainsMono Nerd Font :pixelsize=10:antialias=true:autohint=true";
+static char *font = "JetBrainsMono Nerd Font :pixelsize=13:antialias=true:autohint=true";
 static int borderpx = 2;
 
 /*
@@ -163,8 +163,8 @@ static unsigned int cursorshape = 2;
  * Default columns and rows numbers
  */
 
-static unsigned int cols = 140;
-static unsigned int rows = 48;
+static unsigned int cols = 120;
+static unsigned int rows = 40;
 
 /*
  * Default colour and shape of the mouse cursor
