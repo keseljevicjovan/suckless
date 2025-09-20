@@ -21,7 +21,7 @@
 /*X(" ",      "sb-music",            0   ,   4)*/\
 /*X(" ",      "sb-cpu-percent",      5   ,   0)*/\
   X("",        "sb-pacupdate",        3600,   3)  \
-  X("󰌌 ",      "sb-keyboard-layout",  0,      2)  \
+  X(" 󰌌 ",      "sb-keyboard-layout",  0,      2)  \
   X("  ",     "sb-memory",           5,      0)  \
 /*X("  ",     "sb-memory-percent",   5,      0)*/\
   X("",        "sb-volume",           0,      1)  \
