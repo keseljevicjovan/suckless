@@ -50,10 +50,10 @@ Also available in the patches directories:
  - [xresources-with-reload-signal](https://st.suckless.org/patches/xresources-with-reload-signal)
  - ~~[xresources](https://st.suckless.org/patches/xresources)~~
 
-#### dmenu (5)
+#### dmenu (6)
  - [alpha](https://tools.suckless.org/dmenu/patches/alpha)
  - ~~[border](https://tools.suckless.org/dmenu/patches/border)~~
- - ~~[center](https://tools.suckless.org/dmenu/patches/center)~~
+ - [center](https://tools.suckless.org/dmenu/patches/center)
  - [grid](https://tools.suckless.org/dmenu/patches/grid)
  - ~~[xresources](https://tools.suckless.org/dmenu/patches/xresources)~~
  - [xresources-alt](https://tools.suckless.org/dmenu/patches/xresources-alt)
