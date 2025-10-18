@@ -1,11 +1,12 @@
 /* See LICENSE file for copyright and license details. */
 /* Default settings; can be overriden by command line. */
 
+enum { ALPHA_OPACITY = 0xdd };
 static int topbar = 1;                      /* -b  option; if 0, dmenu appears at bottom     */
 static int centered = 0;                    /* -c option; centers dmenu on screen */
 static int min_width = 0;                    /* minimum width when centered */
 static const float menu_height_ratio = 2.0f;  /* This is the ratio used in the original calculation */
-static const unsigned int alpha = 0xff;     /* Amount of opacity. 0xff is opaque             */
+static unsigned int alpha = ALPHA_OPACITY;     /* Amount of opacity. 0xff is opaque             */
 static int fuzzy  = 1;                      /* -F  option; if 0, dmenu doesn't use fuzzy matching */
 /* -fn option overrides fonts[0]; default X11 font or font set */
 static char font[] = "JetBrainsMono Nerd Font :size=9";
@@ -26,10 +27,10 @@ static const char *colors[SchemeLast][2] = {
   [SchemeCursor] = { "#222222",   "#bbbbbb"   }
 };
 
-static const unsigned int alphas[SchemeLast][2] = {
-	[SchemeNorm] = { OPAQUE, alpha },
-	[SchemeSel] = { OPAQUE, alpha },
-	[SchemeOut] = { OPAQUE, alpha },
+static unsigned int alphas[SchemeLast][2] = {
+	[SchemeNorm] = { OPAQUE, ALPHA_OPACITY },
+	[SchemeSel]  = { OPAQUE, ALPHA_OPACITY },
+	[SchemeOut]  = { OPAQUE, ALPHA_OPACITY },
 };
 
 /* -l and -g options; controls number of lines and columns in grid if > 0 */
