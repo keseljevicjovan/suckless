@@ -1142,7 +1142,14 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
 			fstrncmp = strncasecmp;
 			fstrstr = cistrstr;
-		} else if (!strcmp(argv[i], "-vi")) {
+		} 
+    else if (!strcmp(argv[i], "-t")) {  /* disable transparency */
+      alpha = 0xff;
+      alphas[SchemeNorm][1] = alpha;
+      alphas[SchemeSel][1]  = alpha;
+      alphas[SchemeOut][1]  = alpha;
+    }
+    else if (!strcmp(argv[i], "-vi")) {
 			vi_mode = 1;
 			using_vi_mode = start_mode;
 			global_esc.ksym = XK_Escape;
