@@ -101,8 +101,7 @@ static const char *dmenu_keyboard_layout[] = { "dmenu_change_keyboard_layout", N
 static const char *locker[] = { "slock", NULL };
 
 /* Wallpaper */
-static const char *dmenu_wallpaper[] = { "change_wallpaper", NULL };
-static const char *nsxiv_wallpaper[] = { "change_wallpaper", "nsxiv", NULL };
+static const char *change_wallpaper[] = { "change_wallpaper", NULL };
 
 /* Web Browser */
 static const char *browser[] = { "firefox", NULL };
@@ -129,7 +128,7 @@ static const char *dmenu_clipboard_paste[] = { "dmenu_clipboard", "select", NULL
  
 /* Dmenu */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-i", "-vi", "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-c", "-i", "-vi", "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
 
 static const Key keys[] = {
   /* modifier                     key                       function          argument */
@@ -145,8 +144,7 @@ static const Key keys[] = {
   { MODKEY|ShiftMask,             XK_p,                     spawn,            {.v = kill_picom } },
   { MODKEY|ControlMask,           XK_p,                     spawn,            {.v = start_picom } },
   { MODKEY,                       XK_s,                     spawn,            {.v = locker } },
-  { MODKEY,                       XK_w,                     spawn,            {.v = nsxiv_wallpaper } },
-  { MODKEY|ShiftMask,             XK_w,                     spawn,            {.v = dmenu_wallpaper } },
+  { MODKEY,                       XK_w,                     spawn,            {.v = change_wallpaper } },
   { MODKEY|ShiftMask,             XK_c,                     spawn,            {.v = dmenu_colorscheme } },
   { MODKEY|ControlMask,           XK_c,                     spawn,            {.v = dmenu_colorscheme_full } },
   { MODKEY|ControlMask,           XK_e,                     spawn,            {.v = dmenu_emoji } },
