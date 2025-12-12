@@ -109,3 +109,26 @@ For Arch-based distros, use pacman:
 ```sh
 sudo pacman -Syu base-devel libx11 libxft libxinerama libxrandr libxext libxrender fontconfig freetype2 libexif imlib2 shadow
 ```
+
+#### Q: How do I make my dwm status bar transparent?
+A: Adjust the alpha values and background color in your dwm/config.h:
+```c
+static const unsigned int baralpha  =   0xff;
+static const unsigned int borderalpha = 0xff;
+static const char *colors[][3]      = {
+    [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
+    [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
+}
+```
+to this:
+```c
+static const unsigned int baralpha  =   0x00;
+static const unsigned int borderalpha = OPAQUE;
+static const char *colors[][3]      = {
+    /*               fg           bg           border   */
+    [SchemeNorm] = { normfgcolor, "#000000",   normbordercolor },
+    [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
+};
+```
+This is useful for solid-color backgrounds, but it can cause issues with colorful images (text not being visible).
+For that reason, I didn’t include it in my main config.
