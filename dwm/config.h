@@ -18,27 +18,27 @@ static char selbgcolor[]            = "#005577";
 static const unsigned int baralpha  =   0xff;
 static const unsigned int borderalpha = 0xff;
 static const char *colors[][3]      = {
-    /*               fg           bg           border   */
-    [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
-    [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
+  /*               fg           bg           border   */
+  [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
+  [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
 };
 static const unsigned int alphas[][3]      = {
-    /*               fg      bg        border*/
-    [SchemeNorm] = { OPAQUE, baralpha, borderalpha },
-    [SchemeSel]  = { OPAQUE, baralpha, borderalpha },
+  /*               fg      bg        border*/
+  [SchemeNorm] = { OPAQUE, baralpha, borderalpha },
+  [SchemeSel]  = { OPAQUE, baralpha, borderalpha },
 };
 
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
-	/* xprop(1):
-	 *	WM_CLASS(STRING) = instance, class
-	 *	WM_NAME(STRING) = title
-	 */
-	/* class          instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
-//{ "Gimp",         NULL,     NULL,           0,         1,          0,           0,        -1 },
-//{ "Firefox",      NULL,     NULL,           1 << 8,    0,          0,          -1,        -1 },
+  /* xprop(1):
+   *	WM_CLASS(STRING) = instance, class
+   *	WM_NAME(STRING) = title
+   */
+  /* class          instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
+  //{ "Gimp",         NULL,     NULL,           0,         1,          0,           0,        -1 },
+  //{ "Firefox",      NULL,     NULL,           1 << 8,    0,          0,          -1,        -1 },
   { "st-256color",  NULL,     NULL,           0,         0,          1,           0,        -1 },	
   { "Nsxiv",        NULL,     NULL,           0,         1,          0,           0,        -1 },	
   { NULL,           NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
@@ -51,19 +51,19 @@ static const int resizehints = 0;    /* 1 means respect size hints in tiled resi
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
 static const Layout layouts[] = {
-	/* symbol     arrange function */
-	{ "[]=",      tile },    /* first entry is default */
-	{ "><>",      NULL },    /* no layout function means floating behavior */
-	{ "[M]",      monocle },
+  /* symbol     arrange function */
+  { "[]=",      tile },    /* first entry is default */
+  { "><>",      NULL },    /* no layout function means floating behavior */
+  { "[M]",      monocle },
 };
 
 /* key definitions */
 #define MODKEY Mod4Mask
 #define TAGKEYS(KEY,TAG) \
-	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
-	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
-	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
-	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
+{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
+  { MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
+  { MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
+  { MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
@@ -124,10 +124,13 @@ static const char *dmenu_emoji[] = { "dmenu_unicode", NULL };
 /* Clip History */
 static const char *dmenu_clipboard_copy[] = { "dmenu_clipboard", "save", NULL };
 static const char *dmenu_clipboard_paste[] = { "dmenu_clipboard", "select", NULL };
- 
+
+/* Password */
+static const char *dmenu_pass[] = { "dmenu_pass", NULL };
+
 /* Dmenu */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-c", "-i", "-vi", "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-c", "-i", "-vi", NULL };
 
 static const Key keys[] = {
   /* modifier                     key                       function          argument */
@@ -150,6 +153,7 @@ static const Key keys[] = {
   { MODKEY,                       XK_g,                     spawn,            {.v = dmenu_game } },
   { MODKEY,                       XK_c,                     spawn,            {.v = dmenu_clipboard_copy } },
   { MODKEY,                       XK_v,                     spawn,            {.v = dmenu_clipboard_paste } },
+  { MODKEY|ControlMask,           XK_g,                     spawn,            {.v = dmenu_pass } },
   { MODKEY|ShiftMask,             XK_b,                     togglebar,        {0} },
   { MODKEY,                       XK_j,                     focusstack,       {.i = +1 } },
   { MODKEY,                       XK_k,                     focusstack,       {.i = -1 } },
@@ -167,7 +171,7 @@ static const Key keys[] = {
   { MODKEY,                       XK_t,                     setlayout,        {.v = &layouts[0]} },
   { MODKEY,                       XK_f,                     setlayout,        {.v = &layouts[1]} },
   { MODKEY,                       XK_m,                     setlayout,        {.v = &layouts[2]} },
-//{ MODKEY|ShiftMask,             XK_v,                     setlayout,        {0} },
+  //{ MODKEY|ShiftMask,             XK_v,                     setlayout,        {0} },
   { MODKEY|ShiftMask,             XK_v,                     togglefloating,   {0} },
   { MODKEY|ShiftMask,             XK_f,                     togglefullscr,    {0} },
   { MODKEY|ControlMask,           XK_f,                     fullscreen,       {0} },
