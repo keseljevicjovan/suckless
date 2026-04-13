@@ -67,4 +67,5 @@ ResourcePref resources[] = {
 	{ "selfgcolor",  STRING, &selfgcolor },
 	{ "selbgcolor",  STRING, &selbgcolor },
 	{ "prompt",      STRING, &prompt },
+  { "border_width",INTEGER,&border_width },
 };
