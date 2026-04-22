@@ -72,6 +72,7 @@ static const Layout layouts[] = {
 /* Terminal Emulator */
 #define TERMINAL "st"
 static const char *termcmd[]  = { TERMINAL, NULL };
+static const char *term_float[]  = { "st-float", NULL };
 
 /* Control Media Players */
 static const char *medplaypausecmd[] = { "playerctl", "play-pause", NULL };
@@ -137,6 +138,7 @@ static const Key keys[] = {
   /* modifier                     key                       function          argument */
   { MODKEY,                       XK_d,                     spawn,            {.v = dmenucmd } },
   { MODKEY,                       XK_Return,                spawn,            {.v = termcmd }  },
+  { MODKEY|ControlMask,           XK_Return,                spawn,            {.v = term_float }  },
   { MODKEY,                       XK_b,                     spawn,            {.v = browser }  },
   { MODKEY,                       XK_r,                     spawn,            {.v = file_manager }  },
   { MODKEY,                       XK_e,                     spawn,            {.v = editor} },
