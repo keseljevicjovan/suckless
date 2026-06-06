@@ -1,4 +1,3 @@
 mew
-config.h
 *.o
 *-protocol.*
