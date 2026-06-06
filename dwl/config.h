@@ -7,9 +7,9 @@
 static const int sloppyfocus               = 1;  /* focus follows mouse */
 static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
 static const unsigned int borderpx         = 1;  /* border pixel of windows */
-static const float rootcolor[]             = COLOR(0x222222ff);
+static const float rootcolor[]             = COLOR(0x000000ff);
 static const float bordercolor[]           = COLOR(0x444444ff);
-static const float focuscolor[]            = COLOR(0x005577ff);
+static const float focuscolor[]            = COLOR(0xffffffff);
 static const float urgentcolor[]           = COLOR(0xff0000ff);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
@@ -114,31 +114,38 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
-static const char *medplaypausecmd[] = { "playerctl", "play-pause", NULL };
-static const char *mednextcmd[]       = { "playerctl", "next", NULL };
-static const char *medprevcmd[]       = { "playerctl", "previous", NULL };
-static const char *mutecmd[]          = { "wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle", NULL };
-static const char *volupcmd[]         = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+", NULL };
-static const char *voldowncmd[]       = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-", NULL };
+/* Control Media Players */
+static const char *medplaypausecmd[] = { "mediactl", "play-pause", NULL };
+static const char *mednextcmd[] = { "mediactl", "next", NULL };
+static const char *medprevcmd[] = { "mediactl", "prev", NULL };
+static const char *mutecmd[] = { "mediactl", "mute", NULL };
+static const char *volupcmd[] = { "mediactl", "volup", NULL };
+static const char *voldowncmd[] = { "mediactl", "voldown", NULL };
 
-static const char *brightness_up[]   = { "brightnessctl", "set", "+10%", NULL };
-static const char *brightness_down[] = { "brightnessctl", "set", "10%-", NULL };
+/* Brightness */
+static const char *brightness_up[]   = { "brightnessctl","s","5%+", NULL };
+static const char *brightness_down[] = { "brightnessctl","s","5%-", NULL };
 
-/* commands */
 static const char *termcmd[] = { "foot", NULL };
+static const char *browser[] = { "firefox", NULL };
 static const char *menucmd[] = { "mew-run", NULL };
+static const char *locker[] = { "hyprlock", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: 2 -> at, etc. */
 	/* modifier                  key                            function          argument */
 	{ MODKEY,                    XKB_KEY_d,                     spawn,            {.v = menucmd} },
 	{ MODKEY,                    XKB_KEY_Return,                spawn,            {.v = termcmd} },
+	{ MODKEY,                    XKB_KEY_b,                     spawn,            {.v = browser} },
+	{ MODKEY,                    XKB_KEY_s,                     spawn,            {.v = locker} },
+	{ MODKEY,                    XKB_KEY_h,                     focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_j,                     focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,                     focusstack,       {.i = -1} },
+	{ MODKEY,                    XKB_KEY_l,                     focusstack,       {.i = -1} },
 	{ MODKEY,                    XKB_KEY_i,                     incnmaster,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_d,                     incnmaster,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_h,                     setmfact,         {.f = -0.05f} },
-	{ MODKEY,                    XKB_KEY_l,                     setmfact,         {.f = +0.05f} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_h,                     setmfact,         {.f = -0.05f} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_l,                     setmfact,         {.f = +0.05f} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,                zoom,             {0} },
 	{ MODKEY,                    XKB_KEY_Tab,                   view,             {0} },
 	{ MODKEY,                    XKB_KEY_q,                     killclient,       {0} },
@@ -146,22 +153,22 @@ static const Key keys[] = {
 //{ MODKEY,                    XKB_KEY_f,                     setlayout,        {.v = &layouts[1]} },
 	{ MODKEY,                    XKB_KEY_m,                     setlayout,        {.v = &layouts[2]} },
 	{ MODKEY,                    XKB_KEY_space,                 setlayout,        {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,                 togglefloating,   {0} },
-	{ MODKEY,                    XKB_KEY_f,                     togglefullscreen, {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_v,                     togglefloating,   {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_f,                     togglefullscreen, {0} },
 	{ MODKEY,                    XKB_KEY_0,                     view,             {.ui = ~0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_parenright,            tag,              {.ui = ~0} },
 	{ MODKEY,                    XKB_KEY_comma,                 focusmon,         {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY,                    XKB_KEY_period,                focusmon,         {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,                  tagmon,           {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,               tagmon,           {.i = WLR_DIRECTION_RIGHT} },
-	{ 0,                         XKB_KEY_XF86AudioMute,         spawn,            {.v = mutecmd } },
-	{ 0,                         XKB_KEY_XF86AudioLowerVolume,  spawn,            {.v = voldowncmd } },
-	{ 0,                         XKB_KEY_XF86AudioRaiseVolume,  spawn,            {.v = volupcmd } },
-	{ 0,                         XKB_KEY_XF86AudioPlay,         spawn,            {.v = medplaypausecmd } },
-	{ 0,                         XKB_KEY_XF86AudioNext,         spawn,            {.v = mednextcmd } },
-	{ 0,                         XKB_KEY_XF86AudioPrev,         spawn,            {.v = medprevcmd } },
-	{ 0,                         XKB_KEY_XF86MonBrightnessUp,   spawn,            {.v = brightness_up } },
-	{ 0,                         XKB_KEY_XF86MonBrightnessDown, spawn,            {.v = brightness_down } },
+	{ 0,                         XKB_KEY_XF86AudioMute,         spawn,            {.v = mutecmd} },
+	{ 0,                         XKB_KEY_XF86AudioLowerVolume,  spawn,            {.v = voldowncmd} },
+	{ 0,                         XKB_KEY_XF86AudioRaiseVolume,  spawn,            {.v = volupcmd} },
+	{ 0,                         XKB_KEY_XF86AudioPlay,         spawn,            {.v = medplaypausecmd} },
+	{ 0,                         XKB_KEY_XF86AudioNext,         spawn,            {.v = mednextcmd} },
+	{ 0,                         XKB_KEY_XF86AudioPrev,         spawn,            {.v = medprevcmd} },
+	{ 0,                         XKB_KEY_XF86MonBrightnessUp,   spawn,            {.v = brightness_up} },
+	{ 0,                         XKB_KEY_XF86MonBrightnessDown, spawn,            {.v = brightness_down} },
 	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                                   0),
 	TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                                       1),
 	TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                               2),
