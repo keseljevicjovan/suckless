@@ -114,6 +114,10 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
+#define TERMINAL "foot"
+static const char *termcmd[]  = { TERMINAL, NULL };
+//static const char *term_float[]  = { "st-float", NULL };
+
 /* Control Media Players */
 static const char *medplaypausecmd[] = { "mediactl", "play-pause", NULL };
 static const char *mednextcmd[] = { "mediactl", "next", NULL };
@@ -126,10 +130,38 @@ static const char *voldowncmd[] = { "mediactl", "voldown", NULL };
 static const char *brightness_up[]   = { "brightnessctl","s","5%+", NULL };
 static const char *brightness_down[] = { "brightnessctl","s","5%-", NULL };
 
-static const char *termcmd[] = { "foot", NULL };
-static const char *browser[] = { "firefox", NULL };
-static const char *menucmd[] = { "mew-run", NULL };
+/* Screenshot */
+static const char *screenshot[] = { "screenshot", NULL};
+static const char *screenshot_select[] = { "screenshot", "select", NULL};
+
+/* Keyboard Layout */   
+static const char *keyboard_layout[] = { "change_keyboard_layout", NULL };
+static const char *dmenu_keyboard_layout[] = { "dmenu_change_keyboard_layout", NULL };
+
+/* Lock Screen */
 static const char *locker[] = { "hyprlock", NULL };
+
+/* Web Browser */
+static const char *browser[] = { "firefox", NULL };
+
+/* Text Editor */
+static const char *editor[] = { TERMINAL,"-e", "nvim", NULL };
+
+/* File Manager */
+static const char *file_manager[] = { TERMINAL, "-e", "zsh", "-ic", "source ~/.zshrc; lfcd; exec zsh", NULL };
+
+/* Emojis */
+static const char *dmenu_emoji[] = { "dmenu_unicode", NULL };
+
+/* Clip History */
+static const char *dmenu_clipboard_copy[] = { "dmenu_clipboard", "save", NULL };
+static const char *dmenu_clipboard_paste[] = { "dmenu_clipboard", "select", NULL };
+
+/* Password */
+static const char *dmenu_pass[] = { "dmenu_pass", NULL };
+
+/* Menu */
+static const char *menucmd[] = { "mew-run", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: 2 -> at, etc. */
@@ -137,7 +169,17 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_d,                     spawn,            {.v = menucmd} },
 	{ MODKEY,                    XKB_KEY_Return,                spawn,            {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_b,                     spawn,            {.v = browser} },
-	{ MODKEY,                    XKB_KEY_s,                     spawn,            {.v = locker} },
+  { MODKEY,                    XKB_KEY_r,                     spawn,            {.v = file_manager }  },
+  { MODKEY,                    XKB_KEY_e,                     spawn,            {.v = editor} },
+  { 0,                         XKB_KEY_Print,                 spawn,            {.v = screenshot} },
+  { MODKEY,                    XKB_KEY_Print,                 spawn,            {.v = screenshot_select} },
+  { MODKEY,                    XKB_KEY_space,                 spawn,            {.v = keyboard_layout} },
+  { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_space,                 spawn,            {.v = dmenu_keyboard_layout} },
+  { MODKEY,                    XKB_KEY_s,                     spawn,            {.v = locker} },
+  { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_e,                     spawn,            {.v = dmenu_emoji} },
+  { MODKEY,                    XKB_KEY_c,                     spawn,            {.v = dmenu_clipboard_copy} },
+  { MODKEY,                    XKB_KEY_v,                     spawn,            {.v = dmenu_clipboard_paste} },
+  { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_g,                     spawn,            {.v = dmenu_pass} },
 	{ MODKEY,                    XKB_KEY_h,                     focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_j,                     focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,                     focusstack,       {.i = -1} },
