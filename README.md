@@ -7,3 +7,4 @@ This repository is used for personal builds of suckless software. It includes:
 - dwl ([codeberg.org](https://codeberg.org/dwl/dwl)) 
 - mew ([codeberg.org](https://codeberg.org/sewn/mew)) 
 - dwlb ([github.com](https://github.com/kolunmi/dwlb))
+- someblocks ([sourcehut.hub](https://git.sr.ht/~raphi/someblocks))
