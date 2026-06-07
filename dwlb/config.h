@@ -5,7 +5,7 @@
 	  .alpha = (hex & 0xff) * 257 }
 
 // use ipc functionality
-static bool ipc = false;
+static bool ipc = true;
 // initially hide all bars
 static bool hidden = false;
 // initially draw all bars at the bottom
