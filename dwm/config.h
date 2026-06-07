@@ -75,12 +75,12 @@ static const char *termcmd[]  = { TERMINAL, NULL };
 static const char *term_float[]  = { "st-float", NULL };
 
 /* Control Media Players */
-static const char *medplaypausecmd[] = { "playerctl", "play-pause", NULL };
-static const char *mednextcmd[] = { "playerctl", "next", NULL };
-static const char *medprevcmd[] = { "playerctl", "previous", NULL };
-static const char *mutecmd[] = { "sh", "-c", "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; kill -35 $(pidof dwmblocks)", NULL };
-static const char *volupcmd[] = { "sh", "-c", "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+; kill -35 $(pidof dwmblocks)", NULL };
-static const char *voldowncmd[] = { "sh", "-c", "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-; kill -35 $(pidof dwmblocks)", NULL };
+static const char *medplaypausecmd[] = { "mediactl", "play-pause", NULL };
+static const char *mednextcmd[] = { "mediactl", "next", NULL };
+static const char *medprevcmd[] = { "mediactl", "prev", NULL };
+static const char *mutecmd[] = { "mediactl", "mute", NULL };
+static const char *volupcmd[] = { "mediactl", "volup", NULL };
+static const char *voldowncmd[] = { "mediactl", "voldown", NULL };
 
 /* Brightness */
 static const char *brightness_up[]   = { "brightnessctl","s","5%+", NULL };
@@ -93,6 +93,7 @@ static const char *start_picom[] = { "picom", NULL };
 /* Screenshot */
 static const char *screenshot[] = { "screenshot", NULL};
 static const char *screenshot_select[] = { "screenshot", "select", NULL};
+static const char *screenshot_all[] = { "screenshot", "all", NULL};
 
 /* Keyboard Layout */   
 static const char *keyboard_layout[] = { "change_keyboard_layout", NULL };
@@ -144,6 +145,7 @@ static const Key keys[] = {
   { MODKEY,                       XK_e,                     spawn,            {.v = editor} },
   { 0,                            XK_Print,                 spawn,            {.v = screenshot } },
   { MODKEY,                       XK_Print,                 spawn,            {.v = screenshot_select } },
+  { MODKEY|ShiftMask,             XK_Print,                 spawn,            {.v = screenshot_all } },
   { MODKEY,                       XK_space,                 spawn,            {.v = keyboard_layout } },
   { MODKEY|ControlMask,           XK_space,                 spawn,            {.v = dmenu_keyboard_layout } },
   { MODKEY|ShiftMask,             XK_p,                     spawn,            {.v = kill_picom } },
