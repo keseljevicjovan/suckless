@@ -50,10 +50,11 @@ static const MonitorRule monrules[] = {
 /* keyboard */
 static const struct xkb_rule_names xkb_rules = {
 	/* can specify fields: rules, model, layout, variant, options */
-	/* example:
-	.options = "ctrl:nocaps",
-	*/
-	.options = NULL,
+	.rules = NULL,
+	.model = NULL,
+	.layout = "us,rs",
+	.variant = NULL,
+	.options = "grp:win_space_toggle",
 };
 
 static const int repeat_rate = 25;
@@ -151,14 +152,14 @@ static const char *editor[] = { TERMINAL,"-e", "nvim", NULL };
 static const char *file_manager[] = { TERMINAL, "-e", "zsh", "-ic", "source ~/.zshrc; lfcd; exec zsh", NULL };
 
 /* Emojis */
-static const char *dmenu_emoji[] = { "dmenu_unicode", NULL };
+static const char *dmenu_emoji[] = { "mew_unicode", NULL };
 
 /* Clip History */
-static const char *dmenu_clipboard_copy[] = { "dmenu_clipboard", "save", NULL };
-static const char *dmenu_clipboard_paste[] = { "dmenu_clipboard", "select", NULL };
+static const char *dmenu_clipboard_copy[] = { "mew_clipboard", "save", NULL };
+static const char *dmenu_clipboard_paste[] = { "mew_clipboard", "select", NULL };
 
 /* Password */
-static const char *dmenu_pass[] = { "dmenu_pass", NULL };
+static const char *dmenu_pass[] = { "mew_pass", NULL };
 
 /* Menu */
 static const char *menucmd[] = { "mew-run", NULL };
@@ -180,6 +181,7 @@ static const Key keys[] = {
   { MODKEY,                    XKB_KEY_c,                     spawn,            {.v = dmenu_clipboard_copy} },
   { MODKEY,                    XKB_KEY_v,                     spawn,            {.v = dmenu_clipboard_paste} },
   { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_g,                     spawn,            {.v = dmenu_pass} },
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_b,                     togglebar,        {0} },
 	{ MODKEY,                    XKB_KEY_h,                     focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_j,                     focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,                     focusstack,       {.i = -1} },
