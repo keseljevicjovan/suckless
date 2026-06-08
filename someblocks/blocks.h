@@ -2,7 +2,7 @@
 static const Block blocks[] = {
   /*Icon*/ /*Command*/		        /*Update Interval*/	/*Update Signal*/
   { "",    "sb-pacupdate",        3600,               3},
-//{ "󰌌 ",  "sb-keyboard-layout",  0,                  2}, // Does not work on wayland
+  { "󰌌 ",  "sb-keyboard-layout",  0,                  2},
   { "  ", "sb-memory",           5,                  0},
   { "",    "sb-volume",           0,                  1},
   { " ",  "sb-clock-date",       360,                0},

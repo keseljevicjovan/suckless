@@ -1,0 +1,188 @@
+From c80ab5d3dacc5cf22382f88287eeba5d298be483 Mon Sep 17 00:00:00 2001
+From: Nikita Ivanov <nikita.vyach.ivanov@gmail.com>
+Date: Tue, 4 Feb 2025 23:42:10 +0100
+Subject: [PATCH] Add per client keyboard layout and status bar info
+
+---
+ config.def.h |  3 +++
+ dwl.c        | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 73 insertions(+), 1 deletion(-)
+
+diff --git a/config.def.h b/config.def.h
+index 8a6eda0..09b6e57 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -13,6 +13,9 @@ static const float focuscolor[]            = COLOR(0x005577ff);
+ static const float urgentcolor[]           = COLOR(0xff0000ff);
+ /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
+ static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
++/* keyboard layout change notification for status bar */
++static const char  kblayout_file[] = "/tmp/dwl-keymap";
++static const char *kblayout_cmd[]  = {"pkill", "-RTMIN+3", "someblocks", NULL};
+ 
+ /* tagging - TAGCOUNT must be no greater than 31 */
+ #define TAGCOUNT (9)
+diff --git a/dwl.c b/dwl.c
+index 44f3ad9..279571b 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -14,6 +14,7 @@
+ #include <wayland-server-core.h>
+ #include <wlr/backend.h>
+ #include <wlr/backend/libinput.h>
++#include <wlr/interfaces/wlr_keyboard.h>
+ #include <wlr/render/allocator.h>
+ #include <wlr/render/wlr_renderer.h>
+ #include <wlr/types/wlr_alpha_modifier_v1.h>
+@@ -139,6 +140,7 @@ typedef struct {
+ 	uint32_t tags;
+ 	int isfloating, isurgent, isfullscreen;
+ 	uint32_t resize; /* configure serial of a pending resize */
++	unsigned int kblayout_idx;
+ } Client;
+ 
+ typedef struct {
+@@ -291,6 +293,7 @@ static void gpureset(struct wl_listener *listener, void *data);
+ static void handlesig(int signo);
+ static void incnmaster(const Arg *arg);
+ static void inputdevice(struct wl_listener *listener, void *data);
++static void kblayout(KeyboardGroup *kb);
+ static int keybinding(uint32_t mods, xkb_keysym_t sym);
+ static void keypress(struct wl_listener *listener, void *data);
+ static void keypressmod(struct wl_listener *listener, void *data);
+@@ -436,6 +439,8 @@ static struct wl_listener request_start_drag = {.notify = requeststartdrag};
+ static struct wl_listener start_drag = {.notify = startdrag};
+ static struct wl_listener new_session_lock = {.notify = locksession};
+ 
++static unsigned int kblayout_idx = -1;
++
+ #ifdef XWAYLAND
+ static void activatex11(struct wl_listener *listener, void *data);
+ static void associatex11(struct wl_listener *listener, void *data);
+@@ -945,6 +950,8 @@ createkeyboard(struct wlr_keyboard *keyboard)
+ 
+ 	/* Add the new keyboard to the group */
+ 	wlr_keyboard_group_add_keyboard(kb_group->wlr_group, keyboard);
++
++	kblayout(kb_group);
+ }
+ 
+ KeyboardGroup *
+@@ -1122,11 +1129,13 @@ createnotify(struct wl_listener *listener, void *data)
+ 	/* This event is raised when a client creates a new toplevel (application window). */
+ 	struct wlr_xdg_toplevel *toplevel = data;
+ 	Client *c = NULL;
++	struct wlr_keyboard *kb = wlr_seat_get_keyboard(seat);
+ 
+ 	/* Allocate a Client for this surface */
+ 	c = toplevel->base->data = ecalloc(1, sizeof(*c));
+ 	c->surface.xdg = toplevel->base;
+ 	c->bw = borderpx;
++	c->kblayout_idx = kb ? kb->modifiers.group : 0;
+ 
+ 	LISTEN(&toplevel->base->surface->events.commit, &c->commit, commitnotify);
+ 	LISTEN(&toplevel->base->surface->events.map, &c->map, mapnotify);
+@@ -1402,10 +1411,24 @@ dirtomon(enum wlr_direction dir)
+ void
+ focusclient(Client *c, int lift)
+ {
++	/* Copied from wlroots/types/wlr_keyboard_group.c */
++	struct keyboard_group_device {
++		struct wlr_keyboard *keyboard;
++		struct wl_listener key;
++		struct wl_listener modifiers;
++		struct wl_listener keymap;
++		struct wl_listener repeat_info;
++		struct wl_listener destroy;
++		struct wl_list link; // wlr_keyboard_group.devices
++	};
++
+ 	struct wlr_surface *old = seat->keyboard_state.focused_surface;
+ 	int unused_lx, unused_ly, old_client_type;
+ 	Client *old_c = NULL;
+ 	LayerSurface *old_l = NULL;
++	struct keyboard_group_device *device;
++	struct wlr_keyboard *kb = wlr_seat_get_keyboard(seat);
++	struct wlr_keyboard_group *group = kb ? wlr_keyboard_group_from_wlr_keyboard(kb) : NULL;
+ 
+ 	if (locked)
+ 		return;
+@@ -1457,6 +1480,20 @@ focusclient(Client *c, int lift)
+ 	}
+ 	printstatus();
+ 
++	/* Update keyboard layout */
++	if (group) {
++		// Update the first real device, because kb or group->kb is not a real
++		// keyboard and its effective layout gets overwritten
++		device = wl_container_of(group->devices.next, device, link);
++		if (device->keyboard)
++			wlr_keyboard_notify_modifiers(device->keyboard,
++					device->keyboard->modifiers.depressed,
++					device->keyboard->modifiers.latched,
++					device->keyboard->modifiers.locked,
++					c ? c->kblayout_idx : 0
++		);
++	}
++
+ 	if (!c) {
+ 		/* With no client, all we have left is to clear focus */
+ 		wlr_seat_keyboard_notify_clear_focus(seat);
+@@ -1467,7 +1504,7 @@ focusclient(Client *c, int lift)
+ 	motionnotify(0, NULL, 0, 0, 0, 0);
+ 
+ 	/* Have a client, so focus its top-level wlr_surface */
+-	client_notify_enter(client_surface(c), wlr_seat_get_keyboard(seat));
++	client_notify_enter(client_surface(c), kb);
+ 
+ 	/* Activate the new client */
+ 	client_activate_surface(client_surface(c), 1);
+@@ -1605,6 +1642,36 @@ inputdevice(struct wl_listener *listener, void *data)
+ 	wlr_seat_set_capabilities(seat, caps);
+ }
+ 
++void
++kblayout(KeyboardGroup *kb)
++{
++	FILE *f;
++	Client *c;
++	unsigned int idx = kb->wlr_group->keyboard.modifiers.group;
++
++	// If layout did not change, do nothing
++	if (kblayout_idx == idx)
++		return;
++	kblayout_idx = idx;
++
++	// Update client layout
++	if ((c = focustop(selmon)))
++		c->kblayout_idx = kblayout_idx;
++
++	// Save current layout to kblayout_file
++	if (*kblayout_file && (f = fopen(kblayout_file, "w"))) {
++		fputs(xkb_keymap_layout_get_name(kb->wlr_group->keyboard.keymap,
++				idx), f);
++		fclose(f);
++	}
++
++	// Run kblayout_cmd
++	if (kblayout_cmd[0] && fork() == 0) {
++		execvp(kblayout_cmd[0], (char *const *)kblayout_cmd);
++		die("dwl: execvp %s failed:", kblayout_cmd[0]);
++	}
++}
++
+ int
+ keybinding(uint32_t mods, xkb_keysym_t sym)
+ {
+@@ -1683,6 +1750,8 @@ keypressmod(struct wl_listener *listener, void *data)
+ 	/* Send modifiers to the client. */
+ 	wlr_seat_keyboard_notify_modifiers(seat,
+ 			&group->wlr_group->keyboard.modifiers);
++
++	kblayout(group);
+ }
+ 
+ int
+-- 
+2.53.0
+
