@@ -24,6 +24,7 @@ static const Rule rules[] = {
 	/* app_id             title       tags mask     isfloating   monitor */
 	{ "Gimp_EXAMPLE",     NULL,       0,            1,           -1 }, /* Start on currently visible tags floating, not tiled */
 	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           -1 }, /* Start on ONLY tag "9" */
+	{ "foot-float",       NULL,       0,            1,           -1 }, /* Start on ONLY tag "9" */
     /* default/example rule: can be changed but cannot be eliminated; at least one rule must exist */
 };
 
@@ -117,7 +118,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 
 #define TERMINAL "foot"
 static const char *termcmd[]  = { TERMINAL, NULL };
-//static const char *term_float[]  = { "st-float", NULL };
+static const char *term_float[]  = { "foot-float", NULL };
 
 /* Control Media Players */
 static const char *medplaypausecmd[] = { "mediactl", "play-pause", NULL };
@@ -134,6 +135,7 @@ static const char *brightness_down[] = { "brightnessctl","s","5%-", NULL };
 /* Screenshot */
 static const char *screenshot[] = { "screenshot", NULL};
 static const char *screenshot_select[] = { "screenshot", "select", NULL};
+static const char *screenshot_all[] = { "screenshot", "all", NULL};
 
 /* Keyboard Layout */   
 static const char *keyboard_layout[] = { "change_keyboard_layout", NULL };
@@ -169,11 +171,13 @@ static const Key keys[] = {
 	/* modifier                  key                            function          argument */
 	{ MODKEY,                    XKB_KEY_d,                     spawn,            {.v = menucmd} },
 	{ MODKEY,                    XKB_KEY_Return,                spawn,            {.v = termcmd} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,                spawn,            {.v = term_float} },
 	{ MODKEY,                    XKB_KEY_b,                     spawn,            {.v = browser} },
   { MODKEY,                    XKB_KEY_r,                     spawn,            {.v = file_manager }  },
   { MODKEY,                    XKB_KEY_e,                     spawn,            {.v = editor} },
   { 0,                         XKB_KEY_Print,                 spawn,            {.v = screenshot} },
   { MODKEY,                    XKB_KEY_Print,                 spawn,            {.v = screenshot_select} },
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Print,                 spawn,            {.v = screenshot_all} },
   { MODKEY,                    XKB_KEY_space,                 spawn,            {.v = keyboard_layout} },
   { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_space,                 spawn,            {.v = dmenu_keyboard_layout} },
   { MODKEY,                    XKB_KEY_s,                     spawn,            {.v = locker} },
