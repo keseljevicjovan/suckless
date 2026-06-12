@@ -146,10 +146,6 @@ static const char *screenshot[] = { "screenshot", NULL};
 static const char *screenshot_select[] = { "screenshot", "select", NULL};
 static const char *screenshot_all[] = { "screenshot", "all", NULL};
 
-/* Keyboard Layout */   
-static const char *keyboard_layout[] = { "change_keyboard_layout", NULL };
-static const char *dmenu_keyboard_layout[] = { "dmenu_change_keyboard_layout", NULL };
-
 /* Lock Screen */
 static const char *locker[] = { "hyprlock", NULL };
 
@@ -163,17 +159,17 @@ static const char *editor[] = { TERMINAL,"-e", "nvim", NULL };
 static const char *file_manager[] = { TERMINAL, "-e", "zsh", "-ic", "source ~/.zshrc; lfcd; exec zsh", NULL };
 
 /* Emojis */
-static const char *dmenu_emoji[] = { "mew_unicode", NULL };
+static const char *mew_emoji[] = { "mew_unicode", NULL };
 
 /* Clip History */
-static const char *dmenu_clipboard_copy[] = { "mew_clipboard", "save", NULL };
-static const char *dmenu_clipboard_paste[] = { "mew_clipboard", "select", NULL };
+static const char *mew_clipboard_copy[] = { "mew_clipboard", "save", NULL };
+static const char *mew_clipboard_paste[] = { "mew_clipboard", "select", NULL };
 
 /* Password */
-static const char *dmenu_pass[] = { "mew_pass", NULL };
+static const char *mew_pass[] = { "mew_pass", NULL };
 
 /* Menu */
-static const char *menucmd[] = { "mew-run", NULL };
+static const char *menucmd[] = { "mew-run", "-i" , NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: 2 -> at, etc. */
@@ -187,20 +183,18 @@ static const Key keys[] = {
   { 0,                         XKB_KEY_Print,                 spawn,            {.v = screenshot} },
   { MODKEY,                    XKB_KEY_Print,                 spawn,            {.v = screenshot_select} },
   { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Print,                 spawn,            {.v = screenshot_all} },
-  { MODKEY,                    XKB_KEY_space,                 spawn,            {.v = keyboard_layout} },
-  { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_space,                 spawn,            {.v = dmenu_keyboard_layout} },
   { MODKEY,                    XKB_KEY_s,                     spawn,            {.v = locker} },
-  { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_e,                     spawn,            {.v = dmenu_emoji} },
-  { MODKEY,                    XKB_KEY_c,                     spawn,            {.v = dmenu_clipboard_copy} },
-  { MODKEY,                    XKB_KEY_v,                     spawn,            {.v = dmenu_clipboard_paste} },
-  { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_g,                     spawn,            {.v = dmenu_pass} },
+  { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_e,                     spawn,            {.v = mew_emoji} },
+  { MODKEY,                    XKB_KEY_c,                     spawn,            {.v = mew_clipboard_copy} },
+  { MODKEY,                    XKB_KEY_v,                     spawn,            {.v = mew_clipboard_paste} },
+  { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_g,                     spawn,            {.v = mew_pass} },
   { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_b,                     togglebar,        {0} },
 	{ MODKEY,                    XKB_KEY_h,                     focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_j,                     focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,                     focusstack,       {.i = -1} },
 	{ MODKEY,                    XKB_KEY_l,                     focusstack,       {.i = -1} },
 	{ MODKEY,                    XKB_KEY_i,                     incnmaster,       {.i = +1} },
-	{ MODKEY,                    XKB_KEY_d,                     incnmaster,       {.i = -1} },
+	{ MODKEY,                    XKB_KEY_p,                     incnmaster,       {.i = -1} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_h,                     setmfact,         {.f = -0.05f} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_l,                     setmfact,         {.f = +0.05f} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,                zoom,             {0} },
