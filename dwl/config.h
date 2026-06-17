@@ -147,7 +147,7 @@ static const char *screenshot_select[] = { "screenshot", "select", NULL};
 static const char *screenshot_all[] = { "screenshot", "all", NULL};
 
 /* Lock Screen */
-static const char *locker[] = { "hyprlock", NULL };
+static const char *locker[] = { "swaylock", NULL };
 
 /* Web Browser */
 static const char *browser[] = { "firefox", NULL };
