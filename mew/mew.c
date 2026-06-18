@@ -501,17 +501,14 @@ keyboard_keypress(enum wl_keyboard_key_state state, xkb_keysym_t sym)
 		case XKB_KEY_g: sym = XKB_KEY_Escape; break;
 		case XKB_KEY_h: sym = XKB_KEY_BackSpace; break;
 		case XKB_KEY_i: sym = XKB_KEY_Tab; break;
-		case XKB_KEY_j: /* fallthrough */
+		case XKB_KEY_k: sym = XKB_KEY_Up; break;
+		case XKB_KEY_j: sym = XKB_KEY_Down; break;
 		case XKB_KEY_J: /* fallthrough */
 		case XKB_KEY_m: /* fallthrough */
 		case XKB_KEY_M: sym = XKB_KEY_Return; break;
 		case XKB_KEY_n: sym = XKB_KEY_Down; break;
 		case XKB_KEY_p: sym = XKB_KEY_Up; break;
 
-		case XKB_KEY_k: /* delete right */
-			text[cursor] = '\0';
-			match();
-			goto draw;
 		case XKB_KEY_u: /* delete left */
 			insert(NULL, 0 - cursor);
 			goto draw;
