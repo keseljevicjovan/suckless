@@ -280,6 +280,7 @@ drawmenu(void)
 	unsigned int curpos;
 	struct item *item;
 	int x = 0, y = 0, w;
+	char *censort; 
 	DrwBuf *buf;
 
 	errno = 0;
@@ -296,8 +297,14 @@ drawmenu(void)
 	}
 	/* draw input field */
 	w = (lines > 0 || !matches) ? mw - x : inputw;
-	drwl_setscheme(drw, colors[SchemeNorm]);
-	drwl_text(drw, x, 0, w, bh, lrpad / 2, text, 0);
+  drwl_setscheme(drw, colors[SchemeNorm]);
+  if (passwd) {
+    censort = calloc(1, sizeof(text));
+    memset(censort, '*', strlen(text));
+    drwl_text(drw, x, 0, w, bh, lrpad / 2, censort, 0);
+    free(censort);
+  } else
+    drwl_text(drw, x, 0, w, bh, lrpad / 2, text, 0);
 
 	curpos = TEXTW(text) - TEXTW(&text[cursor]);
 	if ((curpos += lrpad / 2 - 1) < w) {
@@ -909,6 +916,11 @@ readstdin(void)
 	size_t i, itemsiz = 0, linesiz = 0;
 	ssize_t len;
 
+  if (passwd) {
+    inputw = lines = 0;
+    return;
+  }
+
 	/* read each line from stdin and add it to the item list */
 	for (i = 0; (len = getline(&line, &linesiz, stdin)) != -1; i++) {
 		if (i + 1 >= itemsiz) {
@@ -1004,7 +1016,7 @@ setup(void)
 static void
 usage(void)
 {
-	die("usage: mew [-beiv] [-l lines] [-p prompt] [-f font] [-o output]\n"
+	die("usage: mew [-beivP] [-l lines] [-p prompt] [-f font] [-o output]\n"
 	    "           [-nb color] [-nf color] [-sb color] [-sf color]");
 }
 
@@ -1025,7 +1037,9 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-i")) { 
 			fstrncmp = strncasecmp;
 			fstrstr = cistrstr;
-		} else if (i + 1 == argc)
+    }	else if (!strcmp(argv[i], "-P"))
+      passwd = 1; 
+    else if (i + 1 == argc)
 			usage();
 		else if (!strcmp(argv[i], "-l"))
 			lines = atoi(argv[++i]);
