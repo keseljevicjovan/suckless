@@ -202,7 +202,7 @@ static const Key keys[] = {
   { MODKEY,                    XKB_KEY_g,                     togglegaps,       {0} },
 	{ MODKEY,                    XKB_KEY_q,                     killclient,       {0} },
 	{ MODKEY,                    XKB_KEY_t,                     setlayout,        {.v = &layouts[0]} },
-//{ MODKEY,                    XKB_KEY_f,                     setlayout,        {.v = &layouts[1]} },
+  { MODKEY,                    XKB_KEY_f,                     setlayout,        {.v = &layouts[1]} },
 	{ MODKEY,                    XKB_KEY_m,                     setlayout,        {.v = &layouts[2]} },
 	{ MODKEY,                    XKB_KEY_space,                 setlayout,        {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_v,                     togglefloating,   {0} },
