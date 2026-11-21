@@ -15,6 +15,7 @@
 #include <wayland-server-core.h>
 #include <wlr/backend.h>
 #include <wlr/backend/libinput.h>
+#include <wlr/interfaces/wlr_keyboard.h>
 #include <wlr/render/allocator.h>
 #include <wlr/render/swapchain.h>
 #include <wlr/render/wlr_renderer.h>
@@ -160,6 +161,7 @@ typedef struct {
 	unsigned int bw;
 	uint32_t tags;
 	int isfloating, isurgent, isfullscreen;
+  unsigned int kblayout_idx;
 } Client;
 
 typedef struct {
@@ -331,6 +333,7 @@ static void gpureset(struct wl_listener *listener, void *data);
 static void handlesig(int signo);
 static void incnmaster(const Arg *arg);
 static void inputdevice(struct wl_listener *listener, void *data);
+static void kblayout(KeyboardGroup *kb);
 static const Key *keybinding(uint32_t mods, xkb_keysym_t sym);
 static void keypress(struct wl_listener *listener, void *data);
 static void keypressmod(struct wl_listener *listener, void *data);
@@ -484,6 +487,8 @@ static struct wl_listener new_foreign_toplevel_capture_request = {.notify = capt
 
 static struct zdwl_ipc_manager_v2_interface dwl_manager_implementation = {.release = dwl_ipc_manager_release, .get_output = dwl_ipc_manager_get_output};
 static struct zdwl_ipc_output_v2_interface dwl_output_implementation = {.release = dwl_ipc_output_release, .set_tags = dwl_ipc_output_set_tags, .set_layout = dwl_ipc_output_set_layout, .set_client_tags = dwl_ipc_output_set_client_tags};
+
+static unsigned int kblayout_idx = -1;
 
 #ifdef XWAYLAND
 static void activatex11(struct wl_listener *listener, void *data);
@@ -1070,6 +1075,8 @@ createkeyboard(struct wlr_keyboard *keyboard)
 
 	/* Add the new keyboard to the group */
 	wlr_keyboard_group_add_keyboard(kb_group->wlr_group, keyboard);
+
+	kblayout(kb_group);
 }
 
 KeyboardGroup *
@@ -1249,11 +1256,13 @@ createnotify(struct wl_listener *listener, void *data)
 	/* This event is raised when a client creates a new toplevel (application window). */
 	struct wlr_xdg_toplevel *toplevel = data;
 	Client *c = NULL;
+	struct wlr_keyboard *kb = wlr_seat_get_keyboard(seat);
 
 	/* Allocate a Client for this surface */
 	c = toplevel->base->data = ecalloc(1, sizeof(*c));
 	c->surface.xdg = toplevel->base;
 	c->bw = borderpx;
+	c->kblayout_idx = kb ? kb->modifiers.group : 0;
 
 	LISTEN(&toplevel->base->surface->events.commit, &c->commit, commitnotify);
 	LISTEN(&toplevel->base->surface->events.map, &c->map, mapnotify);
@@ -1729,10 +1738,24 @@ dwl_ipc_output_release(struct wl_client *client, struct wl_resource *resource)
 void
 focusclient(Client *c, int lift)
 {
+	/* Copied from wlroots/types/wlr_keyboard_group.c */
+	struct keyboard_group_device {
+		struct wlr_keyboard *keyboard;
+		struct wl_listener key;
+		struct wl_listener modifiers;
+		struct wl_listener keymap;
+		struct wl_listener repeat_info;
+		struct wl_listener destroy;
+		struct wl_list link; // wlr_keyboard_group.devices
+	};
+
 	struct wlr_surface *old = seat->keyboard_state.focused_surface;
 	int unused_lx, unused_ly, old_client_type;
 	Client *old_c = NULL;
 	LayerSurface *old_l = NULL;
+	struct keyboard_group_device *device;
+	struct wlr_keyboard *kb = wlr_seat_get_keyboard(seat);
+	struct wlr_keyboard_group *group = kb ? wlr_keyboard_group_from_wlr_keyboard(kb) : NULL;
 
 	if (locked)
 		return;
@@ -1786,6 +1809,20 @@ focusclient(Client *c, int lift)
 	}
 	printstatus();
 
+	/* Update keyboard layout */
+	if (group) {
+		// Update the first real device, because kb or group->kb is not a real
+		// keyboard and its effective layout gets overwritten
+		device = wl_container_of(group->devices.next, device, link);
+		if (device->keyboard)
+			wlr_keyboard_notify_modifiers(device->keyboard,
+					device->keyboard->modifiers.depressed,
+					device->keyboard->modifiers.latched,
+					device->keyboard->modifiers.locked,
+					c ? c->kblayout_idx : 0
+		);
+	}
+
 	if (!c) {
 		/* With no client, all we have left is to clear focus */
 		input_method_relay_set_focus(input_method_relay, NULL);
@@ -1799,7 +1836,7 @@ focusclient(Client *c, int lift)
 	input_method_relay_set_focus(input_method_relay, client_surface(c));
 
 	/* Have a client, so focus its top-level wlr_surface */
-	client_notify_enter(client_surface(c), wlr_seat_get_keyboard(seat));
+	client_notify_enter(client_surface(c), kb);
 
 	/* Activate the new client */
 	client_activate_surface(client_surface(c), 1);
@@ -2026,6 +2063,38 @@ keypressmod(struct wl_listener *listener, void *data)
 	/* Send modifiers to the client. */
 	wlr_seat_keyboard_notify_modifiers(seat,
 			&group->wlr_group->keyboard.modifiers);
+
+  kblayout(group);
+}
+
+void
+kblayout(KeyboardGroup *kb)
+{
+	FILE *f;
+	Client *c;
+	unsigned int idx = kb->wlr_group->keyboard.modifiers.group;
+
+	// If layout did not change, do nothing
+	if (kblayout_idx == idx)
+		return;
+	kblayout_idx = idx;
+
+	// Update client layout
+	if ((c = focustop(selmon)))
+		c->kblayout_idx = kblayout_idx;
+
+	// Save current layout to kblayout_file
+	if (*kblayout_file && (f = fopen(kblayout_file, "w"))) {
+		fputs(xkb_keymap_layout_get_name(kb->wlr_group->keyboard.keymap,
+				idx), f);
+		fclose(f);
+	}
+
+	// Run kblayout_cmd
+	if (kblayout_cmd[0] && fork() == 0) {
+		execvp(kblayout_cmd[0], (char *const *)kblayout_cmd);
+		die("dwl: execvp %s failed:", kblayout_cmd[0]);
+	}
 }
 
 int

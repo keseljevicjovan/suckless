@@ -13,6 +13,9 @@ static const float bordercolor[]           = COLOR(0x444444ff);
 static const float focuscolor[]            = COLOR(0xffffffff);
 static const float urgentcolor[]           = COLOR(0xff0000ff);
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
+/* keyboard layout change notification for status bar */
+static const char  kblayout_file[] = "/tmp/dwl-keymap";
+static const char *kblayout_cmd[]  = {"pkill", "-RTMIN+2", "someblocks", NULL};
 
 /* tagging - TAGCOUNT must be no greater than 31 */
 #define TAGCOUNT (9)
@@ -118,28 +121,28 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 /* commands */
 #define TERMINAL "foot"
 
-static const char *brightness_down[]     = { "brightnessctl", "s", "5%-", NULL };
-static const char *brightness_up[]       = { "brightnessctl", "s", "5%+", NULL };
-static const char *browser[]             = { "firefox", NULL };
+static const char *termcmd[]             = { TERMINAL, NULL };
 static const char *editor[]              = { TERMINAL, "-e", "nvim", NULL };
 static const char *file_manager[]        = { TERMINAL, "-e", "zsh", "-ic", "source ~/.zshrc; lfcd; exec zsh", NULL };
-static const char *locker[]              = { "swaylock", NULL };
+static const char *term_float[]          = { "foot-float", NULL };
+static const char *voldowncmd[]          = { "mediactl", "voldown", NULL };
+static const char *volupcmd[]            = { "mediactl", "volup", NULL };
+static const char *mutecmd[]             = { "mediactl", "mute", NULL };
 static const char *mednextcmd[]          = { "mediactl", "next", NULL };
 static const char *medplaypausecmd[]     = { "mediactl", "play-pause", NULL };
 static const char *medprevcmd[]          = { "mediactl", "prev", NULL };
+static const char *brightness_down[]     = { "brightnessctl", "s", "5%-", NULL };
+static const char *brightness_up[]       = { "brightnessctl", "s", "5%+", NULL };
+static const char *browser[]             = { "firefox", NULL };
+static const char *locker[]              = { "swaylock", NULL };
 static const char *menucmd[]             = { "mew-run", "-i" , NULL };
 static const char *mew_clipboard_copy[]  = { "mew_clipboard", "save", NULL };
 static const char *mew_clipboard_paste[] = { "mew_clipboard", "select", NULL };
 static const char *mew_emoji[]           = { "mew_unicode", NULL };
 static const char *mew_pass[]            = { "mew_pass", NULL };
-static const char *mutecmd[]             = { "mediactl", "mute", NULL };
 static const char *screenshot[]          = { "screenshot", NULL};
 static const char *screenshot_all[]      = { "screenshot", "all", NULL};
 static const char *screenshot_select[]   = { "screenshot", "select", NULL};
-static const char *term_float[]          = { "foot-float", NULL };
-static const char *termcmd[]             = { TERMINAL, NULL };
-static const char *voldowncmd[]          = { "mediactl", "voldown", NULL };
-static const char *volupcmd[]            = { "mediactl", "volup", NULL };
 
 static const Key keys[] = {
   /* modifier                  key                            function          argument */
@@ -163,8 +166,8 @@ static const Key keys[] = {
   { MODKEY,                    XKB_KEY_l,                     focusstack,       {.i = +1} },
   { MODKEY,                    XKB_KEY_i,                     incnmaster,       {.i = +1} },
   { MODKEY,                    XKB_KEY_p,                     incnmaster,       {.i = -1} },
-  { MODKEY,                    XKB_KEY_h,                     setmfact,         {.f = -0.02f} },
-  { MODKEY,                    XKB_KEY_l,                     setmfact,         {.f = +0.02f} },
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_h,                     setmfact,         {.f = -0.02f} },
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_l,                     setmfact,         {.f = +0.02f} },
   { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_b,                     togglebar,        {0} },
   { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,                zoom,             {0} },
   { MODKEY,                    XKB_KEY_Tab,                   view,             {0} },
@@ -172,8 +175,8 @@ static const Key keys[] = {
   { MODKEY,                    XKB_KEY_t,                     setlayout,        {.v = &layouts[0]} },
   { MODKEY,                    XKB_KEY_f,                     setlayout,        {.v = &layouts[1]} },
   { MODKEY,                    XKB_KEY_m,                     setlayout,        {.v = &layouts[2]} },
-  { MODKEY,                    XKB_KEY_space,                 setlayout,        {0} },
-  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,                 togglefloating,   {0} },
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,                 setlayout,        {0} },
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_v,                     togglefloating,   {0} },
   { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_f,                     togglefullscreen, {0} },
   { MODKEY,                    XKB_KEY_0,                     view,             {.ui = ~0} },
   { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_0,                     tag,              {.ui = ~0} },
