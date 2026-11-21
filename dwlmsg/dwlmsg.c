@@ -31,6 +31,7 @@ static int cflag;
 static int vflag;
 static int mflag;
 static int fflag;
+static int xflag;
 
 static uint32_t occ, seltags, sel, urg;
 
@@ -160,6 +161,15 @@ dwl_ipc_output_floating(void *data, struct zdwl_ipc_output_v2 *dwl_ipc_output,
 }
 
 static void
+dwl_ipc_output_focused_geometry(void *data, struct zdwl_ipc_output_v2 *dwl_ipc_output,
+	int32_t x, int32_t y, int32_t width, int32_t height)
+{
+	if (!xflag) return;
+	if (data) printf("%s ", (char *)data);
+	printf("geometry %d %d %d %d\n", x, y, width, height);
+}
+
+static void
 dwl_ipc_output_frame(void *data, struct zdwl_ipc_output_v2 *dwl_ipc_output)
 {
 	if (mode & SET) {
@@ -263,6 +273,7 @@ static const struct zdwl_ipc_output_v2_listener dwl_ipc_output_listener = {
 	.layout_symbol = dwl_ipc_output_layout_symbol,
 	.fullscreen = dwl_ipc_output_fullscreen,
 	.floating = dwl_ipc_output_floating,
+  .focused_geometry = dwl_ipc_output_focused_geometry,
 	.frame = dwl_ipc_output_frame,
 };
 
@@ -453,6 +464,11 @@ main(int argc, char *argv[])
 		if (mode & SET) usage(1);
 		mode |= GET;
 		break;
+  case 'x':
+    xflag = 1;
+    if (mode & SET) usage(1);
+    mode |= GET;
+    break;
 	default:
 		fprintf(stderr, "%s: bad option: -%c\n", argv0, ARGC());
 		usage(1);
