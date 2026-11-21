@@ -1,12 +1,98 @@
 # Changelog
 
-* [Unreleased](#unreleased)
+* [0.9](#0.9)
+* [0.8](#0.8)
 * [0.7](#0.7)
 * [0.6](#0.6)
 * [0.5](#0.5)
 
 
-## Unreleased
+## 0.9
+
+### Added
+
+* Add axis mouse bindings ([#652][652])
+* Add support for the ext-data-control protocol ([#1184][1184])
+* Add support for the ext-foreign-toplevel-list protocol ([#1223][1223])
+* Add support for the ext-image-copy-capture and ext-image-capture-source protocols (screensharing) ([#1218][1218], [#1223][1223], [#1224][1224])
+* Add support for version 4 of the layer shell protocol (on-demand keyboard interactivity) ([#674][674])
+* Add support for wlr-text-input and wlr-input-method protocols (IME) ([#1219][1219])
+* Snap windows to edges when moving or resizing them ([#608][608])
+
+[1184]: https://codeberg.org/dwl/dwl/pulls/1184
+[1218]: https://codeberg.org/dwl/dwl/pulls/1218
+[1219]: https://codeberg.org/dwl/dwl/pulls/1219
+[1223]: https://codeberg.org/dwl/dwl/pulls/1223
+[1224]: https://codeberg.org/dwl/dwl/pulls/1224
+[608]: https://codeberg.org/dwl/dwl/pulls/608
+[652]: https://codeberg.org/dwl/dwl/pulls/652
+[674]: https://codeberg.org/dwl/dwl/pulls/674
+
+
+### Changed
+
+* Update wlroots to version 0.20 ([#1218][1218])
+* Use modifier-independent key symbols in config.h keybindings ([#1075][1075])
+
+[1075]: https://codeberg.org/dwl/dwl/pulls/1075
+[1218]: https://codeberg.org/dwl/dwl/pulls/1218
+
+
+### Fixed
+
+* Apply a minimum window size of 1x1 ([#1231][1231])
+* Close Xwayland submenus when changing tag or focus ([#1233][1233])
+* Don't make Firefox draw rounded corners when it is opened ([#d1ebf3c][d1ebf3c])
+* Don't send key release events to the wrong client ([#1108][1108])
+* Fix a crash when closing mpv ([#1220][1220])
+* Fix a crash when destroying an idle-inhibitor ([#1214][1214])
+* Fix choppy resizing on newer wlroots ([#1280][1280])
+* Fix the position of certain sub-menus in Xwayland applications ([#1232][1232])
+* Keep the focused border color on the regular client when opening a layer shell surface like wmenu ([#6013835][6013835])
+* Let keybindings focus and tag monitors above and below ([#5fd19fe][5fd19fe])
+* Preserve asleep disabled outputs in output config ([#1198][1198])
+* Respect size hints ([#4de32d2][4de32d2])
+* Set seat capabilities for virtual keyboards and pointers when there is no other input device ([#99cdc9a][99cdc9a])
+* Show popups in fullscreen Xwayland applications ([#1fe1b4e][1fe1b4e])
+* Show the correct cursor after moving and resizing ([#8ad2c92][8ad2c92])
+
+[1108]: https://codeberg.org/dwl/dwl/pulls/1108
+[1198]: https://codeberg.org/dwl/dwl/pulls/1198
+[1214]: https://codeberg.org/dwl/dwl/pulls/1214
+[1220]: https://codeberg.org/dwl/dwl/pulls/1220
+[1231]: https://codeberg.org/dwl/dwl/pulls/1231
+[1232]: https://codeberg.org/dwl/dwl/pulls/1232
+[1233]: https://codeberg.org/dwl/dwl/pulls/1233
+[1280]: https://codeberg.org/dwl/dwl/pulls/1280
+[1fe1b4e]: https://codeberg.org/dwl/dwl/commit/1fe1b4e
+[4de32d2]: https://codeberg.org/dwl/dwl/commit/4de32d2
+[5fd19fe]: https://codeberg.org/dwl/dwl/commit/5fd19fe
+[6013835]: https://codeberg.org/dwl/dwl/commit/6013835
+[8ad2c92]: https://codeberg.org/dwl/dwl/commit/8ad2c92
+[99cdc9a]: https://codeberg.org/dwl/dwl/commit/99cdc9a
+[d1ebf3c]: https://codeberg.org/dwl/dwl/commit/d1ebf3c
+
+
+### Contributors
+
+
+* A Frederick Christensen
+* Alex Denes
+* Andrea Chiavazza
+* Diego Viola
+* Guido Cella
+* Leonardo Hernández Hernández
+* Peter Hofmann
+* Siva Mahadevan
+* julmajustus
+* klim
+* save196
+* sewn
+* thanatos
+
+
+## 0.8
+
 ### Added
 
 * Support for the linux-drm-syncobj-v1 protocol ([wlroots!4715][wlroots!4715], [#685][685])
@@ -17,15 +103,12 @@
 [646]: https://codeberg.org/dwl/dwl/pulls/646
 
 
-### Changed
-### Deprecated
-### Removed
 ### Fixed
 
 * Crash when a client is created while all outputs are disabled.
 
-### Security
-### Contributors
+
+Most changes in this release are not listed. See the commits for details.
 
 
 ## 0.7

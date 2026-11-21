@@ -15,6 +15,32 @@ client_is_x11(Client *c)
 	return 0;
 }
 
+static inline void
+client_get_size_hints(Client *c, struct wlr_box *max, struct wlr_box *min)
+{
+	struct wlr_xdg_toplevel_state *state;
+
+#ifdef XWAYLAND
+	if (client_is_x11(c)) {
+		xcb_size_hints_t *size_hints = c->surface.xwayland->size_hints;
+		if (size_hints) {
+			max->width = size_hints->max_width;
+			max->height = size_hints->max_height;
+			min->width = size_hints->min_width;
+			min->height = size_hints->min_height;
+		}
+		return;
+	}
+#endif
+
+	state = &c->surface.xdg->toplevel->current;
+	max->width = state->max_width;
+	max->height = state->max_height;
+	min->width = state->min_width;
+	min->height = state->min_height;
+}
+
+
 static inline struct wlr_surface *
 client_surface(Client *c)
 {
@@ -131,18 +157,6 @@ client_get_appid(Client *c)
 	return c->surface.xdg->toplevel->app_id ? c->surface.xdg->toplevel->app_id : "broken";
 }
 
-static inline int
-client_get_pid(Client *c)
-{
-	pid_t pid;
-#ifdef XWAYLAND
-	if (client_is_x11(c))
-		return c->surface.xwayland->pid;
-#endif
-	wl_client_get_credentials(c->surface.xdg->client->client, &pid, NULL, NULL);
-	return pid;
-}
-
 static inline void
 client_get_clip(Client *c, struct wlr_box *clip)
 {
@@ -218,13 +232,12 @@ client_get_title(Client *c)
 static inline int
 client_is_float_type(Client *c)
 {
-	struct wlr_xdg_toplevel *toplevel;
-	struct wlr_xdg_toplevel_state state;
+	struct wlr_box min = {0}, max = {0};
+	client_get_size_hints(c, &max, &min);
 
 #ifdef XWAYLAND
 	if (client_is_x11(c)) {
 		struct wlr_xwayland_surface *surface = c->surface.xwayland;
-		xcb_size_hints_t *size_hints = surface->size_hints;
 		if (surface->modal)
 			return 1;
 
@@ -235,17 +248,13 @@ client_is_float_type(Client *c)
 			return 1;
 		}
 
-		return size_hints && size_hints->min_width > 0 && size_hints->min_height > 0
-			&& (size_hints->max_width == size_hints->min_width
-				|| size_hints->max_height == size_hints->min_height);
+		return min.width > 0 && min.height > 0 &&
+			(min.width == max.width || min.height == max.height);
 	}
 #endif
 
-	toplevel = c->surface.xdg->toplevel;
-	state = toplevel->current;
-	return toplevel->parent || (state.min_width != 0 && state.min_height != 0
-		&& (state.min_width == state.max_width
-			|| state.min_height == state.max_height));
+	return c->surface.xdg->toplevel->parent || (min.width > 0 && min.height > 0 &&
+			(min.width == max.width || min.height == max.height));
 }
 
 static inline int
@@ -303,11 +312,18 @@ client_is_unmanaged(Client *c)
 static inline void
 client_notify_enter(struct wlr_surface *s, struct wlr_keyboard *kb)
 {
-	if (kb)
-		wlr_seat_keyboard_notify_enter(seat, s, kb->keycodes,
-				kb->num_keycodes, &kb->modifiers);
-	else
+	uint32_t filtered[WLR_KEYBOARD_KEYS_CAP];
+	size_t size = 0;
+	if (!kb) {
 		wlr_seat_keyboard_notify_enter(seat, s, NULL, 0, NULL);
+		return;
+	}
+	for (size_t i = 0; i < kb->num_keycodes; i++) {
+		uint32_t key = kb->keycodes[i];
+		if (!consumed[key])
+			filtered[size++] = key;
+	}
+	wlr_seat_keyboard_notify_enter(seat, s, filtered, size, &kb->modifiers);
 }
 
 static inline void
@@ -349,20 +365,19 @@ client_set_scale(struct wlr_surface *s, float scale)
 	wlr_surface_set_preferred_buffer_scale(s, (int32_t)ceilf(scale));
 }
 
-static inline uint32_t
+static inline void
 client_set_size(Client *c, uint32_t width, uint32_t height)
 {
 #ifdef XWAYLAND
 	if (client_is_x11(c)) {
 		wlr_xwayland_surface_configure(c->surface.xwayland,
 				c->geom.x + c->bw, c->geom.y + c->bw, width, height);
-		return 0;
+		return;
 	}
 #endif
-	if ((int32_t)width == c->surface.xdg->toplevel->current.width
-			&& (int32_t)height == c->surface.xdg->toplevel->current.height)
-		return 0;
-	return wlr_xdg_toplevel_set_size(c->surface.xdg->toplevel, (int32_t)width, (int32_t)height);
+	if ((int32_t)width != c->surface.xdg->toplevel->current.width
+			|| (int32_t)height != c->surface.xdg->toplevel->current.height)
+		wlr_xdg_toplevel_set_size(c->surface.xdg->toplevel, (int32_t)width, (int32_t)height);
 }
 
 static inline void

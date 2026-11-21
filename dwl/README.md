@@ -10,7 +10,7 @@ primarily in terms of functionality, and secondarily in terms of
 philosophy. Like [dwm], dwl is:
 
 - Easy to understand, hack on, and extend with patches
-- One C source file (or a very small number) configurable via `config.h`
+- One C source file configurable via `config.h`
 - Tied to as few external dependencies as possible
 
 ## Getting Started:
@@ -153,7 +153,6 @@ given the base on which it is built. Implemented default features are:
 - Support screen lockers via ext-session-lock-v1 protocol
 - Various Wayland protocols
 - XWayland support as provided by wlroots (can be enabled in `config.mk`)
-- Zero flickering - Wayland users naturally expect that "every frame is perfect"
 - Layer shell popups (used by Waybar)
 - Damage tracking provided by scenegraph API
 
@@ -166,9 +165,6 @@ indiscriminately. We will try to keep the code as small as possible.
 Features under consideration (possibly as patches) are:
 
 - Protocols made trivial by wlroots
-- Implement the text-input and input-method protocols to support IME once ibus
-  implements input-method v2 (see https://github.com/ibus/ibus/pull/2256 and
-  https://codeberg.org/dwl/dwl/pulls/235)
 
 Feature *non-goals* for the main codebase include:
 
@@ -193,6 +189,10 @@ inspiration, and to the various contributors to the project, including:
   and for helping to keep the project running
 - Stivvo for output management and fullscreen support, and patch maintenance
 
+Also, thanks to our current lead developers:
+
+- @thanatos
+- @guidocella
 
 [wlroots]: https://gitlab.freedesktop.org/wlroots
 [dwm]: https://dwm.suckless.org/

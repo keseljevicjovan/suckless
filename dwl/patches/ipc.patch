@@ -1,39 +1,33 @@
-From 4b38c101a7c0fbdb622da97de89969c3cf59a2e1 Mon Sep 17 00:00:00 2001
-From: Frank Honolka <info.snukware@gmail.com>
-Date: Wed, 18 Mar 2026 09:11:46 +0000
-Subject: [PATCH] adding ipc patch
+From 14ba1bbe5c64e58e6dc1194a8269c7e83c072195 Mon Sep 17 00:00:00 2001
+From: julmajustus <julmajustus@tutanota.com>
+Date: Mon, 21 Sep 2026 21:39:40 +0300
+Subject: [PATCH] ipc: update for v0.9
 
 ---
- Makefile                          |  14 +-
+ Makefile                          |  13 +-
  config.def.h                      |   1 +
- dwl.c                             | 257 ++++++++++++++++++++++++++----
- protocols/dwl-ipc-unstable-v2.xml | 181 +++++++++++++++++++++
- 4 files changed, 419 insertions(+), 34 deletions(-)
+ dwl.c                             | 266 ++++++++++++++++++++++++++----
+ protocols/dwl-ipc-unstable-v2.xml | 191 +++++++++++++++++++++
+ 4 files changed, 437 insertions(+), 34 deletions(-)
  create mode 100644 protocols/dwl-ipc-unstable-v2.xml
 
 diff --git a/Makefile b/Makefile
-index 578194f..84b2a64 100644
+index 8304245..b71571f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -17,12 +17,14 @@ DWLCFLAGS = `$(PKG_CONFIG) --cflags $(PKGS)` $(WLR_INCS) $(DWLCPPFLAGS) $(DWLDEV
- LDLIBS    = `$(PKG_CONFIG) --libs $(PKGS)` $(WLR_LIBS) -lm $(LIBS)
- 
- all: dwl
--dwl: dwl.o util.o
--	$(CC) dwl.o util.o $(DWLCFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
-+dwl: dwl.o util.o dwl-ipc-unstable-v2-protocol.o
-+	$(CC) dwl.o util.o dwl-ipc-unstable-v2-protocol.o $(DWLCFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
- dwl.o: dwl.c client.h config.h config.mk cursor-shape-v1-protocol.h \
+@@ -20,8 +20,9 @@ all: dwl
+ dwl: dwl.c client.h config.h ime.h util.h config.mk cursor-shape-v1-protocol.h \
+ 	ext-image-copy-capture-v1-protocol.h \
  	pointer-constraints-unstable-v1-protocol.h wlr-layer-shell-unstable-v1-protocol.h \
 -	wlr-output-power-management-unstable-v1-protocol.h xdg-shell-protocol.h
+-	$(CC) dwl.c $(DWLCFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
 +	wlr-output-power-management-unstable-v1-protocol.h xdg-shell-protocol.h \
-+	dwl-ipc-unstable-v2-protocol.h
- util.o: util.c util.h
-+dwl-ipc-unstable-v2-protocol.o: dwl-ipc-unstable-v2-protocol.c dwl-ipc-unstable-v2-protocol.h
++	dwl-ipc-unstable-v2-protocol.h dwl-ipc-unstable-v2-protocol.c
++	$(CC) dwl.c dwl-ipc-unstable-v2-protocol.c $(DWLCFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
  
  # wayland-scanner is a tool which generates C headers and rigging for Wayland
  # protocols, which are specified in XML. wlroots requires you to rig these up
-@@ -45,6 +47,12 @@ wlr-output-power-management-unstable-v1-protocol.h:
+@@ -47,11 +48,17 @@ wlr-output-power-management-unstable-v1-protocol.h:
  xdg-shell-protocol.h:
  	$(WAYLAND_SCANNER) server-header \
  		$(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml $@
@@ -42,12 +36,18 @@ index 578194f..84b2a64 100644
 +		protocols/dwl-ipc-unstable-v2.xml $@
 +dwl-ipc-unstable-v2-protocol.c:
 +	$(WAYLAND_SCANNER) private-code \
-+		protocols/dwl-ipc-unstable-v2.xml $@
++        protocols/dwl-ipc-unstable-v2.xml $@
  
  config.h:
  	cp config.def.h $@
+ clean:
+-	rm -f dwl *.o *-protocol.h
++	rm -f dwl *.o *-protocol.h *-protocol.c
+ 
+ dist: clean
+ 	mkdir -p dwl-$(VERSION)
 diff --git a/config.def.h b/config.def.h
-index 8a6eda0..413e6d5 100644
+index 13c5322..998c715 100644
 --- a/config.def.h
 +++ b/config.def.h
 @@ -123,6 +123,7 @@ static const Key keys[] = {
@@ -59,19 +59,19 @@ index 8a6eda0..413e6d5 100644
  	{ MODKEY,                    XKB_KEY_k,           focusstack,       {.i = -1} },
  	{ MODKEY,                    XKB_KEY_i,           incnmaster,       {.i = +1} },
 diff --git a/dwl.c b/dwl.c
-index 101a45f..3bdd57f 100644
+index 4cfd0fd..d24fcb3 100644
 --- a/dwl.c
 +++ b/dwl.c
-@@ -69,6 +69,7 @@
- #include <xcb/xcb_icccm.h>
+@@ -76,6 +76,7 @@
  #endif
  
+ #include "xdg-shell-protocol.h"
 +#include "dwl-ipc-unstable-v2-protocol.h"
  #include "util.h"
  
  /* macros */
-@@ -142,6 +143,12 @@ typedef struct {
- 	uint32_t resize; /* configure serial of a pending resize */
+@@ -161,6 +162,12 @@ typedef struct {
+ 	int isfloating, isurgent, isfullscreen;
  } Client;
  
 +typedef struct {
@@ -83,7 +83,7 @@ index 101a45f..3bdd57f 100644
  typedef struct {
  	uint32_t mod;
  	xkb_keysym_t keysym;
-@@ -186,6 +193,7 @@ typedef struct {
+@@ -205,6 +212,7 @@ typedef struct {
  
  struct Monitor {
  	struct wl_list link;
@@ -91,7 +91,7 @@ index 101a45f..3bdd57f 100644
  	struct wlr_output *wlr_output;
  	struct wlr_scene_output *scene_output;
  	struct wlr_scene_rect *fullscreen_bg; /* See createmon() for info */
-@@ -283,6 +291,17 @@ static void destroypointerconstraint(struct wl_listener *listener, void *data);
+@@ -303,6 +311,17 @@ static void destroypointerconstraint(struct wl_listener *listener, void *data);
  static void destroysessionlock(struct wl_listener *listener, void *data);
  static void destroykeyboardgroup(struct wl_listener *listener, void *data);
  static Monitor *dirtomon(enum wlr_direction dir);
@@ -109,7 +109,7 @@ index 101a45f..3bdd57f 100644
  static void focusclient(Client *c, int lift);
  static void focusmon(const Arg *arg);
  static void focusstack(const Arg *arg);
-@@ -335,6 +354,7 @@ static void startdrag(struct wl_listener *listener, void *data);
+@@ -355,6 +374,7 @@ static void startdrag(struct wl_listener *listener, void *data);
  static void tag(const Arg *arg);
  static void tagmon(const Arg *arg);
  static void tile(Monitor *m);
@@ -117,9 +117,9 @@ index 101a45f..3bdd57f 100644
  static void togglefloating(const Arg *arg);
  static void togglefullscreen(const Arg *arg);
  static void toggletag(const Arg *arg);
-@@ -437,6 +457,9 @@ static struct wl_listener request_start_drag = {.notify = requeststartdrag};
- static struct wl_listener start_drag = {.notify = startdrag};
+@@ -462,6 +482,9 @@ static struct wl_listener start_drag = {.notify = startdrag};
  static struct wl_listener new_session_lock = {.notify = locksession};
+ static struct wl_listener new_foreign_toplevel_capture_request = {.notify = capturerequest};
  
 +static struct zdwl_ipc_manager_v2_interface dwl_manager_implementation = {.release = dwl_ipc_manager_release, .get_output = dwl_ipc_manager_get_output};
 +static struct zdwl_ipc_output_v2_interface dwl_output_implementation = {.release = dwl_ipc_output_release, .set_tags = dwl_ipc_output_set_tags, .set_layout = dwl_ipc_output_set_layout, .set_client_tags = dwl_ipc_output_set_client_tags};
@@ -127,7 +127,7 @@ index 101a45f..3bdd57f 100644
  #ifdef XWAYLAND
  static void activatex11(struct wl_listener *listener, void *data);
  static void associatex11(struct wl_listener *listener, void *data);
-@@ -731,6 +754,10 @@ cleanupmon(struct wl_listener *listener, void *data)
+@@ -823,6 +846,10 @@ cleanupmon(struct wl_listener *listener, void *data)
  	LayerSurface *l, *tmp;
  	size_t i;
  
@@ -138,7 +138,7 @@ index 101a45f..3bdd57f 100644
  	/* m->layers[i] are intentionally not unlinked */
  	for (i = 0; i < LENGTH(m->layers); i++) {
  		wl_list_for_each_safe(l, tmp, &m->layers[i], link)
-@@ -1053,6 +1080,8 @@ createmon(struct wl_listener *listener, void *data)
+@@ -1150,6 +1177,8 @@ createmon(struct wl_listener *listener, void *data)
  	m = wlr_output->data = ecalloc(1, sizeof(*m));
  	m->wlr_output = wlr_output;
  
@@ -147,7 +147,7 @@ index 101a45f..3bdd57f 100644
  	for (i = 0; i < LENGTH(m->layers); i++)
  		wl_list_init(&m->layers[i]);
  
-@@ -1400,6 +1429,192 @@ dirtomon(enum wlr_direction dir)
+@@ -1504,6 +1533,199 @@ dirtomon(enum wlr_direction dir)
  	return selmon;
  }
  
@@ -217,13 +217,13 @@ index 101a45f..3bdd57f 100644
 +{
 +	Monitor *monitor = ipc_output->mon;
 +	Client *c, *focused;
-+	int tagmask, state, numclients, focused_client, tag;
++	int tagmask, state, numclients, is_focused_client, tag;
 +	const char *title, *appid;
 +	focused = focustop(monitor);
 +	zdwl_ipc_output_v2_send_active(ipc_output->resource, monitor == selmon);
 +
 +	for (tag = 0 ; tag < TAGCOUNT; tag++) {
-+		numclients = state = focused_client = 0;
++		numclients = state = is_focused_client = 0;
 +		tagmask = 1 << tag;
 +		if ((tagmask & monitor->tagset[monitor->seltags]) != 0)
 +			state |= ZDWL_IPC_OUTPUT_V2_TAG_STATE_ACTIVE;
@@ -234,13 +234,13 @@ index 101a45f..3bdd57f 100644
 +			if (!(c->tags & tagmask))
 +				continue;
 +			if (c == focused)
-+				focused_client = 1;
++				is_focused_client = 1;
 +			if (c->isurgent)
 +				state |= ZDWL_IPC_OUTPUT_V2_TAG_STATE_URGENT;
 +
 +			numclients++;
 +		}
-+		zdwl_ipc_output_v2_send_tag(ipc_output->resource, tag, state, numclients, focused_client);
++		zdwl_ipc_output_v2_send_tag(ipc_output->resource, tag, state, numclients, is_focused_client);
 +	}
 +	title = focused ? client_get_title(focused) : "";
 +	appid = focused ? client_get_appid(focused) : "";
@@ -254,6 +254,13 @@ index 101a45f..3bdd57f 100644
 +	}
 +	if (wl_resource_get_version(ipc_output->resource) >= ZDWL_IPC_OUTPUT_V2_FLOATING_SINCE_VERSION) {
 +		zdwl_ipc_output_v2_send_floating(ipc_output->resource, focused ? focused->isfloating : 0);
++	}
++	if (wl_resource_get_version(ipc_output->resource) >= ZDWL_IPC_OUTPUT_V2_FULLSCREEN_SINCE_VERSION) {
++		zdwl_ipc_output_v2_send_focused_geometry(ipc_output->resource,
++										   focused ? focused->geom.x : 0,
++										   focused ? focused->geom.y : 0,
++										   focused ? focused->geom.width : 0,
++										   focused ? focused->geom.height : 0);
 +	}
 +	zdwl_ipc_output_v2_send_frame(ipc_output->resource);
 +}
@@ -340,13 +347,13 @@ index 101a45f..3bdd57f 100644
  void
  focusclient(Client *c, int lift)
  {
-@@ -2090,38 +2305,9 @@ void
+@@ -2257,38 +2479,9 @@ void
  printstatus(void)
  {
  	Monitor *m = NULL;
 -	Client *c;
 -	uint32_t occ, urg, sel;
- 
+-
 -	wl_list_for_each(m, &mons, link) {
 -		occ = urg = 0;
 -		wl_list_for_each(c, &clients, link) {
@@ -369,7 +376,7 @@ index 101a45f..3bdd57f 100644
 -			printf("%s floating \n", m->wlr_output->name);
 -			sel = 0;
 -		}
--
+ 
 -		printf("%s selmon %u\n", m->wlr_output->name, m == selmon);
 -		printf("%s tags %"PRIu32" %"PRIu32" %"PRIu32" %"PRIu32"\n",
 -			m->wlr_output->name, occ, m->tagset[m->seltags], sel, urg);
@@ -381,16 +388,18 @@ index 101a45f..3bdd57f 100644
  }
  
  void
-@@ -2648,6 +2834,8 @@ setup(void)
- 	wl_signal_add(&output_mgr->events.apply, &output_mgr_apply);
- 	wl_signal_add(&output_mgr->events.test, &output_mgr_test);
+@@ -2816,6 +3009,10 @@ setup(void)
+ 	text_input_manager = wlr_text_input_manager_v3_create(dpy);
+ 	input_method_relay = input_method_relay_create();
  
++	wl_global_create(dpy, &zdwl_ipc_manager_v2_interface, 2, NULL, dwl_ipc_manager_bind);
++
 +	wl_global_create(dpy, &zdwl_ipc_manager_v2_interface, 2, NULL, dwl_ipc_manager_bind);
 +
  	/* Make sure XWayland clients don't connect to the parent X server,
  	 * e.g when running in the x11 backend or the wayland backend and the
  	 * compositor has Xwayland support */
-@@ -2745,6 +2933,13 @@ tile(Monitor *m)
+@@ -2913,6 +3110,13 @@ tile(Monitor *m)
  	}
  }
  
@@ -406,17 +415,17 @@ index 101a45f..3bdd57f 100644
  {
 diff --git a/protocols/dwl-ipc-unstable-v2.xml b/protocols/dwl-ipc-unstable-v2.xml
 new file mode 100644
-index 0000000..0a6e7e5
+index 0000000..07cc1c2
 --- /dev/null
 +++ b/protocols/dwl-ipc-unstable-v2.xml
-@@ -0,0 +1,181 @@
+@@ -0,0 +1,191 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<!--
 +This is largely ripped from somebar's ipc patchset; just with some personal modifications.
 +I would probably just submit raphi's patchset but I don't think that would be polite.
 +-->
 +<protocol name="dwl_ipc_unstable_v2">
-+  <description summary="inter-proccess-communication about dwl's state">
++  <description summary="inter-process-communication about dwl's state">
 +      This protocol allows clients to update and get updates from dwl.
 +
 +      Warning! The protocol described in this file is experimental and
@@ -436,7 +445,7 @@ index 0000000..0a6e7e5
 +      This interface is exposed as a global in wl_registry.
 +
 +      Clients can use this interface to get a dwl_ipc_output.
-+      After binding the client will receive the dwl_ipc_manager.tags and dwl_ipc_manager.layout events.
++      After binding the client will recieve the dwl_ipc_manager.tags and dwl_ipc_manager.layout events.
 +      The dwl_ipc_manager.tags and dwl_ipc_manager.layout events expose tags and layouts to the client.
 +    </description>
 +
@@ -448,8 +457,8 @@ index 0000000..0a6e7e5
 +    </request>
 +
 +    <request name="get_output">
-+      <description summary="get a dwl_ipc_outout for a wl_output">
-+        Get a dwl_ipc_outout for the specified wl_output.
++      <description summary="get a dwl_ipc_output for a wl_output">
++        Get a dwl_ipc_output for the specified wl_output.
 +      </description>
 +      <arg name="id" type="new_id" interface="zdwl_ipc_output_v2"/>
 +      <arg name="output" type="object" interface="wl_output"/>
@@ -458,7 +467,7 @@ index 0000000..0a6e7e5
 +    <event name="tags">
 +      <description summary="Announces tag amount">
 +        This event is sent after binding.
-+        A roundtrip after binding guarantees the client received all tags.
++        A roundtrip after binding guarantees the client recieved all tags.
 +      </description>
 +      <arg name="amount" type="uint"/>
 +    </event>
@@ -466,7 +475,7 @@ index 0000000..0a6e7e5
 +    <event name="layout">
 +      <description summary="Announces a layout">
 +        This event is sent after binding.
-+        A roundtrip after binding guarantees the client received all layouts.
++        A roundtrip after binding guarantees the client recieved all layouts.
 +      </description>
 +      <arg name="name" type="string"/>
 +    </event>
@@ -490,13 +499,13 @@ index 0000000..0a6e7e5
 +    </enum>
 +
 +    <request name="release" type="destructor">
-+      <description summary="release dwl_ipc_outout">
++      <description summary="release dwl_ipc_output">
 +        Indicates to that the client no longer needs this dwl_ipc_output.
 +      </description>
 +    </request>
 +
 +    <event name="toggle_visibility">
-+      <description summary="Toggle client visibilty">
++      <description summary="Toggle client visibility">
 +        Indicates the client should hide or show themselves.
 +        If the client is visible then hide, if hidden then show.
 +      </description>
@@ -543,7 +552,7 @@ index 0000000..0a6e7e5
 +    <event name="layout_symbol" since="1">
 +      <description summary="Update the current layout symbol">
 +          Indicates the layout has changed. Since layout symbols are dynamic.
-+          As opposed to the zdwl_ipc_manager.layout event, this should take precendence when displaying.
++          As opposed to the zdwl_ipc_manager.layout event, this should take precedence when displaying.
 +          You can ignore the zdwl_ipc_output.layout event.
 +      </description>
 +      <arg name="layout" type="string" summary="The new layout"/>
@@ -572,7 +581,7 @@ index 0000000..0a6e7e5
 +
 +    <request name="set_layout">
 +      <description summary="Set the layout of this output"/>
-+      <arg name="index" type="uint" summary="index of a layout received by dwl_ipc_manager.layout"/>
++      <arg name="index" type="uint" summary="index of a layout recieved by dwl_ipc_manager.layout"/>
 +    </request>
 +
 +    <!-- Version 2 -->
@@ -589,9 +598,18 @@ index 0000000..0a6e7e5
 +      </description>
 +      <arg name="is_floating" type="uint" summary="If the selected client is floating. Nonzero is valid, zero invalid"/>
 +    </event>
++
++    <event name="focused_geometry" since="2">
++      <description summary="Send focused client geometry">
++          Sends the focused client's geometry (x, y, width, and height) to the client.
++      </description>
++      <arg name="x" type="int" summary="X coordinate of the focused client"/>
++      <arg name="y" type="int" summary="Y coordinate of the focused client"/>
++      <arg name="width" type="int" summary="Width of the focused client"/>
++      <arg name="height" type="int" summary="Height of the focused client"/>
++    </event>
 +  </interface>
 +</protocol>
 -- 
-2.53.0
-
+2.55.0
 
