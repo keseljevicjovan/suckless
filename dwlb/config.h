@@ -23,7 +23,7 @@ static bool custom_title = false;
 // title color use active colors
 static bool active_color_title = true;
 // scale
-static uint32_t buffer_scale = 2;
+static uint32_t buffer_scale = 1;
 // font
 static char *fontstr = "JetBrainsMono Nerd Font:size=9";
 // tag names

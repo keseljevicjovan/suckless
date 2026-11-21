@@ -982,6 +982,12 @@ dwl_wm_output_fullscreen(void *data, struct zdwl_ipc_output_v2 *dwl_wm_output,
 }
 
 static void
+dwl_wm_output_focused_geometry(void *data, struct zdwl_ipc_output_v2 *dwl_wm_output,
+	int32_t x, int32_t y, int32_t width, int32_t height)
+{
+}
+
+static void
 dwl_wm_output_floating(void *data, struct zdwl_ipc_output_v2 *dwl_wm_output,
 	uint32_t is_floating)
 {
@@ -997,6 +1003,7 @@ static const struct zdwl_ipc_output_v2_listener dwl_wm_output_listener = {
 	.layout_symbol = dwl_wm_output_layout_symbol,
 	.frame = dwl_wm_output_frame,
 	.fullscreen = dwl_wm_output_fullscreen,
+  .focused_geometry = dwl_wm_output_focused_geometry,
 	.floating = dwl_wm_output_floating
 };
 
