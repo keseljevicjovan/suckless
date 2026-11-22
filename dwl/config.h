@@ -26,11 +26,12 @@ static const char *kblayout_cmd[]  = {"pkill", "-RTMIN+2", "someblocks", NULL};
 static int log_level = WLR_ERROR;
 
 static const Rule rules[] = {
-	/* app_id             title       tags mask     isfloating   isterm   noswallow   monitor */
-	{ "foot",             NULL,       0,            0,           1,       1,          -1 },
-	{ "Gimp_EXAMPLE",     NULL,       0,            1,           0,       0,          -1 }, /* Start on currently visible tags floating, not tiled */
-	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           0,       0,          -1 }, /* Start on ONLY tag "9" */
-    /* default/example rule: can be changed but cannot be eliminated; at least one rule must exist */
+  /* app_id             title       tags mask     isfloating   isterm   noswallow   monitor */
+  { "foot",             NULL,       0,            0,           1,       1,          -1 },
+  { "foot-float",       NULL,       0,            1,           1,       0,          -1 },
+  { "Gimp_EXAMPLE",     NULL,       0,            1,           0,       0,          -1 }, /* Start on currently visible tags floating, not tiled */
+  { "firefox_EXAMPLE",  NULL,       1 << 8,       0,           0,       0,          -1 }, /* Start on ONLY tag "9" */
+  /* default/example rule: can be changed but cannot be eliminated; at least one rule must exist */
 };
 
 /* layout(s) */

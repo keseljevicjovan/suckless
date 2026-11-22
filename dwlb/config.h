@@ -25,7 +25,7 @@ static bool active_color_title = true;
 // scale
 static uint32_t buffer_scale = 1;
 // font
-static char *fontstr = "JetBrainsMono Nerd Font:size=9";
+static char *fontstr = "JetBrains Mono:size=9";
 // tag names
 static char *tags_names[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
