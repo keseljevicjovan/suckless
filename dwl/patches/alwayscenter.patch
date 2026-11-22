@@ -1,0 +1,45 @@
+From 4a0a0a48997d213553ca8e74db5bc0462c82aeca Mon Sep 17 00:00:00 2001
+From: Guido Cella <guido@guidocella.xyz>
+Date: Fri, 13 Nov 2026 00:14:58 +0100
+Subject: [PATCH] center floating windows
+
+---
+ dwl.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/dwl.c b/dwl.c
+index 6365a5a..1118667 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -740,6 +740,7 @@ buttonpress(struct wl_listener *listener, void *data)
+ 	Client *c = NULL;
+ 	LayerSurface *l = NULL;
+ 	const Button *b;
++	struct wlr_box geom;
+ 
+ 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+ 
+@@ -778,7 +779,10 @@ buttonpress(struct wl_listener *listener, void *data)
+ 			motionnotify(0, NULL, 0, 0, 0, 0);
+ 			/* Drop the window off on its new monitor */
+ 			selmon = xytomon(cursor->x, cursor->y);
++			geom = grabc->geom;
+ 			setmon(grabc, selmon, 0);
++			if (grabc->mon && !grabc->isfullscreen && !wlr_box_equal(&geom, &grabc->geom))
++				resize(grabc, geom, 0);
+ 			grabc = NULL;
+ 			return;
+ 		}
+@@ -2812,6 +2816,10 @@ setmon(Client *c, Monitor *m, uint32_t newtags)
+ 		/* Make sure window actually overlaps with the monitor */
+ 		resize(c, c->geom, 0);
+ 		c->tags = newtags ? newtags : m->tagset[m->seltags]; /* assign tags of target monitor */
++		c->prev.x = (m->w.width - c->prev.width) / 2 + m->w.x;
++		c->prev.y = (m->w.height - c->prev.height) / 2 + m->w.y;
++		if (!c->isfullscreen)
++			resize(c, c->prev, 0);
+ 		setfullscreen(c, c->isfullscreen); /* This will call arrange(c->mon) */
+ 		setfloating(c, c->isfloating);
+ 	}
+-- 
+2.56.0
